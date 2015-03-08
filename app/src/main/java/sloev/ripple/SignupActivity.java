@@ -6,20 +6,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 
-public class MainActivity extends ActionBarActivity {
+
+
+public class SignupActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_signup);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_signup, menu);
         return true;
     }
 
@@ -37,7 +42,25 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    public void signIn(View v){
-        System.out.println("sign in");
+
+    public void signUp(View v){
+        /*QBUser qbUser = new QBUser();
+        //qbUser.setLogin(loginEditText.getText().toString());
+        //qbUser.setPassword(passwordEditText.getText().toString());
+        QBUsers.signUpSignInTask(qbUser, new QBEntityCallbackImpl<QBUser>() {
+            @Override
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
+                finish();
+            }
+
+            @Override
+            public void onError(List<String> strings) {
+            }
+        });
+        */
     }
 }
+
+/*
+
+ */

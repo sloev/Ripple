@@ -20,8 +20,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile files('/jars/quickblox-android-sdk-core-2.1.jar', '/jars/quickblox-android-sdk-chat-2.1.jar')
-
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
+    compile files('libs/quickblox-android-sdk-core-2.1.jar')
+    compile files('libs/quickblox-android-sdk-chat-2.1.jar')
+    compile files('libs/quickblox-android-sdk-location-2.1.jar')
 }

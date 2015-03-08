@@ -5,41 +5,38 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Username"
-        android:id="@+id/textView"
+        android:id="@+id/textView2"
         android:textSize="30dp"
+        android:typeface="normal"
+        android:text="Generated username:"
+        android:layout_marginTop="20dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="dsjkfanj42353ndsx"
-        android:id="@+id/pubkeyView"
-        android:textSize="20dp"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:gravity="left"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Password"
-        android:id="@+id/textView4"
-        android:textSize="30dp"
-        android:layout_below="@+id/pubkeyView"
+        android:id="@+id/pubkeyView"
+        android:textSize="20dp"
+        android:typeface="monospace"
+        android:layout_below="@+id/textView2"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
+        android:text="afnslfnsdfnnslnf23452"
+        android:layout_marginTop="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:textSize="30dp"
+        android:typeface="normal"
+        android:text="Password:"
+        android:layout_below="@+id/pubkeyView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_marginTop="20dp" />
 
     <EditText
@@ -48,25 +45,21 @@
         android:inputType="textPassword"
         android:ems="10"
         android:id="@+id/passwordField"
-        android:gravity="left"
-        android:textSize="20dp"
-        android:text="secretpassword"
-        android:layout_below="@+id/textView4"
+        android:layout_below="@+id/textView3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/pubkeyView"
-        android:layout_alignEnd="@+id/pubkeyView" />
+        android:layout_alignParentEnd="true"
+        android:text="secret password"
+        android:layout_marginTop="5dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign in"
-        android:id="@+id/signinButton"
+        android:text="Sign up"
+        android:id="@+id/signUpButton"
         android:layout_below="@+id/passwordField"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="20dp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp"
         android:onClick="signIn" />
+
 </RelativeLayout>
