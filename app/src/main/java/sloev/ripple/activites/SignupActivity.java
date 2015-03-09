@@ -1,5 +1,6 @@
 package sloev.ripple.activites;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -21,12 +22,14 @@ import sloev.ripple.util.ApplicationSingleton;
 public class SignupActivity extends ActionBarActivity {
     SharedPreferences settings;
     EditText passwordField;
+    ApplicationSingleton dataholder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-        settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
+        dataholder = ApplicationSingleton.getDataHolder();
+        settings = getSharedPreferences(dataholder.PREFS_NAME, 0);
         passwordField = (EditText) findViewById(R.id.passwordField);
     }
 
@@ -58,8 +61,12 @@ public class SignupActivity extends ActionBarActivity {
         editor.putString("loginFingerPrint", qbUser.getLogin());
         // Commit the edits!
         editor.commit();
-        ApplicationSingleton.getDataHolder().setSignInQbUser(qbUser);
+        dataholder.setSignInQbUser(qbUser);
+        dataholder.getDataHolder().setSignInUserPassword(qbUser.getPassword());
         System.out.println("signup success");
+
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
     }
 
     private void signupFail(){

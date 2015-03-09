@@ -8,4 +8,10 @@
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_signin">SigninActivity</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="sign_in_refused">Wrong fingerprint or password!</string>
+    <string name="sign_in_refused_sollution">Create new fingerprint instead?</string>
+
+
 </resources>
