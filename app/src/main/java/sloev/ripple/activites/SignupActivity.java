@@ -1,23 +1,33 @@
-package sloev.ripple;
+package sloev.ripple.activites;
 
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import java.util.List;
+
+import sloev.ripple.R;
+import sloev.ripple.util.ApplicationSingleton;
 
 
 public class SignupActivity extends ActionBarActivity {
+    SharedPreferences settings;
+    EditText passwordField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
+        passwordField = (EditText) findViewById(R.id.passwordField);
     }
 
 
@@ -42,22 +52,37 @@ public class SignupActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    private void singupSuccess(QBUser qbUser){
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("signedUp", true);
+        editor.putString("loginFingerPrint", qbUser.getLogin());
+        // Commit the edits!
+        editor.commit();
+        ApplicationSingleton.getDataHolder().setSignInQbUser(qbUser);
+        System.out.println("signup success");
+    }
+
+    private void signupFail(){
+        System.out.println("signup failz");
+    }
 
     public void signUp(View v){
-        /*QBUser qbUser = new QBUser();
-        //qbUser.setLogin(loginEditText.getText().toString());
-        //qbUser.setPassword(passwordEditText.getText().toString());
+        String loginFingerPrint = "johannesdf";
+        QBUser qbUser = new QBUser();
+        qbUser.setLogin(loginFingerPrint);
+        qbUser.setPassword(passwordField.getText().toString());
         QBUsers.signUpSignInTask(qbUser, new QBEntityCallbackImpl<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
+                singupSuccess(qbUser);
                 finish();
             }
 
             @Override
             public void onError(List<String> strings) {
+                signupFail();
             }
         });
-        */
     }
 }
 
