@@ -34,6 +34,7 @@ public class SplashActivity extends ActionBarActivity {
         Credentials.getDataHolder().QBAuthorize();
         //QBSettings.getInstance().fastConfigInit(Credentials., AUTH_KEY, AUTH_SECRET);
 
+
         // Create QuickBlox session
         //
         QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {

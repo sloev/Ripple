@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.users.QBUsers;
@@ -20,17 +21,24 @@ import sloev.ripple.util.ApplicationSingleton;
 
 
 public class SignupActivity extends ActionBarActivity {
-    SharedPreferences settings;
-    EditText passwordField;
-    ApplicationSingleton dataholder;
+    private SharedPreferences settings;
+    private EditText passwordField;
+    private TextView fingerprintView;
+    private String fingerprint;
+
+    private ApplicationSingleton dataholder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        fingerprint = "lolcats";
         dataholder = ApplicationSingleton.getDataHolder();
         settings = getSharedPreferences(dataholder.PREFS_NAME, 0);
         passwordField = (EditText) findViewById(R.id.passwordField);
+        fingerprintView = (TextView) findViewById(R.id.fingerprintView);
+        fingerprintView.setText(fingerprint);
+
     }
 
 
@@ -74,9 +82,8 @@ public class SignupActivity extends ActionBarActivity {
     }
 
     public void signUp(View v){
-        String loginFingerPrint = "johannesdf";
         QBUser qbUser = new QBUser();
-        qbUser.setLogin(loginFingerPrint);
+        qbUser.setLogin(fingerprint);
         qbUser.setPassword(passwordField.getText().toString());
         QBUsers.signUpSignInTask(qbUser, new QBEntityCallbackImpl<QBUser>() {
             @Override

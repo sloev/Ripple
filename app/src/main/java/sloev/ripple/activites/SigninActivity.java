@@ -1,5 +1,6 @@
 package sloev.ripple.activites;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,9 +13,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+
+import org.jivesoftware.smack.SmackException;
 
 import java.util.List;
 
@@ -30,6 +34,11 @@ public class SigninActivity extends ActionBarActivity {
     private SharedPreferences settings;
     private String loginName;
     protected Context context;
+
+    static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
+
+
+    private QBChatService chatservice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +91,8 @@ public class SigninActivity extends ActionBarActivity {
                 dataholder.setSignInUserPassword(passwordField.getText().toString());
                 signinSuccess();
                 finish();
+
+
             }
 
             @Override
@@ -113,8 +124,34 @@ public class SigninActivity extends ActionBarActivity {
         startActivity(intent);
     }
     private void signinSuccess(){
-        Intent intent = new Intent(this, MapActivity.class);
-        startActivity(intent);
-    }
 
+
+        chatservice = dataholder.getChatServiceInstance(this);
+        //TODO brug roster under sdk/snippets/modules/...chat i stedet for følgende!
+
+        chatservice.login(dataholder.getSignInQbUser(), new QBEntityCallbackImpl() {
+            @Override
+            public void onSuccess() {
+
+                // Start sending presences
+                //
+                try {
+                    chatservice.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
+                } catch (SmackException.NotLoggedInException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(SigninActivity.this, MapActivity.class);
+                startActivity(intent);
+
+                finish();
+            }
+
+            @Override
+            public void onError(List errors) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(SigninActivity.this);
+                dialog.setMessage("chat login errors: " + errors).create().show();
+            }
+        });
+    }
 }
