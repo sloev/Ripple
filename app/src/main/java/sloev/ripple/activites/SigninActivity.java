@@ -23,6 +23,7 @@ import org.jivesoftware.smack.SmackException;
 import java.util.List;
 
 import sloev.ripple.R;
+import sloev.ripple.chat.PrivateChatManager;
 import sloev.ripple.util.ApplicationSingleton;
 import sloev.ripple.util.DialogUtils;
 
@@ -33,12 +34,8 @@ public class SigninActivity extends ActionBarActivity {
     private TextView fingerprintView;
     private SharedPreferences settings;
     private String loginName;
-    protected Context context;
-
-    static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
-
-
-    private QBChatService chatservice;
+    private Context context;
+    QBChatService chatService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +46,7 @@ public class SigninActivity extends ActionBarActivity {
 
         dataholder = ApplicationSingleton.getDataHolder();
         fingerprintView = (TextView) findViewById(R.id.fingerprintView);
-        loginName = (String) settings.getString("loginFingerPrint", "");
+        loginName = "bot";//(String) settings.getString("loginFingerPrint", "");
         fingerprintView.setText(loginName);
 
 
@@ -90,13 +87,14 @@ public class SigninActivity extends ActionBarActivity {
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(passwordField.getText().toString());
                 signinSuccess();
-                finish();
+                //finish();
 
 
             }
 
             @Override
             public void onError(List<String> errors) {
+                System.out.println("sign in error");
                 //create dialog asking if you want to create new account instead
                 DialogInterface.OnClickListener checkInPositiveButton;
                 DialogInterface.OnClickListener checkInNegativeButton;
@@ -111,7 +109,7 @@ public class SigninActivity extends ActionBarActivity {
                         // Canceled.
                     }
                 };
-                final android.app.Dialog checkInAlert = DialogUtils.createDialog(context, R.string.sign_in_refused,
+                final android.app.Dialog checkInAlert = DialogUtils.createDialog(SigninActivity.this, R.string.sign_in_refused,
                         R.string.sign_in_refused_sollution, checkInPositiveButton, checkInNegativeButton);
 
                 checkInAlert.show();
@@ -125,23 +123,17 @@ public class SigninActivity extends ActionBarActivity {
     }
     private void signinSuccess(){
 
+        chatService = dataholder.getPrivateChatManager().getChatService();
 
-        chatservice = dataholder.getChatServiceInstance(this);
-        //TODO brug roster under sdk/snippets/modules/...chat i stedet for følgende!
-
-        chatservice.login(dataholder.getSignInQbUser(), new QBEntityCallbackImpl() {
+        chatService.login(dataholder.getSignInQbUser(), new QBEntityCallbackImpl() {
             @Override
             public void onSuccess() {
-
-                // Start sending presences
-                //
+                System.out.println("SIGNINSUCCESS");
                 try {
-                    chatservice.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
+                    chatService.startAutoSendPresence(30);
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
-                }
-
-                Intent intent = new Intent(SigninActivity.this, MapActivity.class);
+                }                Intent intent = new Intent(context, MapActivity.class);
                 startActivity(intent);
 
                 finish();
@@ -153,5 +145,6 @@ public class SigninActivity extends ActionBarActivity {
                 dialog.setMessage("chat login errors: " + errors).create().show();
             }
         });
+
     }
 }

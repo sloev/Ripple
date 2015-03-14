@@ -5,8 +5,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBPagedRequestBuilder;
@@ -14,20 +17,33 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import sloev.ripple.R;
+import sloev.ripple.chat.ChatListener;
 import sloev.ripple.util.ApplicationSingleton;
 
 
-public class MapActivity extends ActionBarActivity {
-
+public class MapActivity extends ActionBarActivity implements ChatListener{
+    Button button;
+    ApplicationSingleton dataholder;
+    boolean first = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        System.out.println("in map activity");
+        button = (Button) findViewById(R.id.button);
+        dataholder = ApplicationSingleton.getDataHolder();
+        dataholder.getPrivateChatManager().initChatListener();
 
+
+/*
         // get dialogs
         //
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
@@ -55,8 +71,11 @@ public class MapActivity extends ActionBarActivity {
                     public void onSuccess(ArrayList<QBUser> users, Bundle params) {
 
                         // Save users
+
                         //
-                        ApplicationSingleton.getDataHolder().setQbUsersList(users);
+                        for (QBUser user : users){
+                            ApplicationSingleton.getDataHolder().addQbUserToList(user.getId(), user);
+                        }
 
                         // build list view
                         //
@@ -77,6 +96,27 @@ public class MapActivity extends ActionBarActivity {
                 dialog.setMessage("get dialogs errors: " + errors).create().show();
             }
         });
+        */
+    }
+    public void send(View v){
+
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setBody("hello world");
+        chatMessage.setDateSent(new Date().getTime() / 1000);
+        try {
+            if (first) {
+                first = false;
+
+                dataholder.getPrivateChatManager().newChat(2526157);
+                dataholder.getPrivateChatManager().addListener(this);
+            }
+            dataholder.getPrivateChatManager().sendMessage(2526157, chatMessage);
+            System.out.println("message send");
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -100,5 +140,10 @@ public class MapActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void gpsReceived(int userId, float lat, float lon) {
+        System.out.println("gpsRECEIVED" + userId + "," + lat + ", " + lon);
     }
 }

@@ -1,5 +1,6 @@
 package sloev.ripple.activites;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -14,12 +15,13 @@ import com.quickblox.core.QBSettings;
 
 import java.util.List;
 
+import sloev.ripple.chat.PrivateChatManager;
 import sloev.ripple.util.ApplicationSingleton;
 import sloev.ripple.R;
 import sloev.ripple.util.Credentials;
 
 
-public class SplashActivity extends ActionBarActivity {
+public class SplashActivity extends Activity {
 
 
     @Override
@@ -51,12 +53,15 @@ public class SplashActivity extends ActionBarActivity {
 
     }
     private void signUpOrSignIn(){
+        PrivateChatManager privateChatManager = new PrivateChatManager(this);
+        ApplicationSingleton.getDataHolder().setPrivateChatManager(privateChatManager);
         SharedPreferences settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
         boolean signedUp = settings.getBoolean("signedUp", false);
 
         Intent intent;
         if (signedUp){
             intent = new Intent(this, SigninActivity.class);
+            System.out.println("signed up allready");
         }else{
             intent = new Intent(this, SignupActivity.class);
         }
@@ -64,25 +69,4 @@ public class SplashActivity extends ActionBarActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_splash, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

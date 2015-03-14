@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.users.model.QBUser;
 
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import org.json.*;
 import sloev.ripple.R;
+import sloev.ripple.chat.PrivateChatManager;
 import sloev.ripple.users.UserStructure;
 
 /**
@@ -39,13 +41,14 @@ public class ApplicationSingleton {
 
 
     private static ApplicationSingleton dataHolder;
-    private List<QBUser> qbUsersList = new ArrayList<QBUser>();
+    private Map<Integer, QBUser> qpUsersMap = new HashMap<Integer, QBUser>();
+
     private Map<String, UserStructure> map = new HashMap<String, UserStructure>();
 
     private QBUser signInQbUser;
 
-    private QBChatService chatService;
 
+    private PrivateChatManager privateChatManager;
 
     public static synchronized ApplicationSingleton getDataHolder() {
         if (dataHolder == null) {
@@ -54,14 +57,13 @@ public class ApplicationSingleton {
         return dataHolder;
     }
 
-    public QBChatService getChatServiceInstance(Context context){
-        QBChatService.setDebugEnabled(false);
-        if (!QBChatService.isInitialized()) {
-            QBChatService.init(context);
-        }
-        return chatService.getInstance();
+    public PrivateChatManager getPrivateChatManager() {
+        return privateChatManager;
     }
 
+    public void setPrivateChatManager(PrivateChatManager privateChatManager) {
+        this.privateChatManager = privateChatManager;
+    }
 
     public void loadUsersFromPreferences(Context context) throws JSONException, InvalidKeySpecException, NoSuchAlgorithmException {
         SharedPreferences settings = context.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
@@ -69,27 +71,19 @@ public class ApplicationSingleton {
         String jsonString = settings.getString(SIGNED_IN_USER, "");
         JSONObject jsonObject = new JSONObject(jsonString);
 
-        String fingerprint = jsonObject.getString("fingerprint");
-        String public_exponent = jsonObject.getString("public_exponent");
-        String public_modulus = jsonObject.getString("public_modulus");
-        String private_exponent = jsonObject.getString("private_exponent");
-        String private_modulus = jsonObject.getString("private_modulus");
-        Boolean enabled = true;
 
         //fp fat alle andre brugere
         jsonString = settings.getString(USERS, "");
-
         JSONArray jsonArray = new JSONArray(jsonString);
 
         //JSONArray jsonArray = jsonData.getJSONArray(USERS);
-
+        int userId;
+        Boolean enabled;
         for(int i=0; i<jsonArray.length(); i++) {
             JSONObject json_data = jsonArray.getJSONObject(i);
-            fingerprint = json_data.getString("fingerprint");
-            public_exponent = jsonObject.getString("public_exponent");
-            public_modulus = jsonObject.getString("public_modulus");
+            userId = jsonObject.getInt("user_id");
             enabled = json_data.getBoolean("enabled");
-            map.put(fingerprint, new UserStructure(public_exponent, public_modulus, enabled));
+            //map.put(fingerprint, new UserStructure(public_exponent, public_modulus, enabled));
         }
 
         //map.put("dog", "type of animal")
@@ -102,40 +96,20 @@ public class ApplicationSingleton {
     public void saveUsersToPreferences(Context context){
         //map.get("dog")
     }
-
-    public void setQbUsersList(List<QBUser> qbUsersList) {
-        this.qbUsersList = qbUsersList;
-    }
-    /*public void setDialogsUsers(List<QBUser> setUsers) {
-        dialogsUsers.clear();
-
-        for (QBUser user : setUsers) {
-            dialogsUsers.put(user.getId(), user);
-        }
-    }*/
-
-    public int getQBUserListSize() {
-        return qbUsersList.size();
+    public String getQBUserName(int userId) {
+        return qpUsersMap.get(userId).getFullName();
     }
 
-    public String getQBUserName(int index) {
-        return qbUsersList.get(index).getFullName();
+    public List<String> getQbUserTags(int userId) {
+        return qpUsersMap.get(userId).getTags();
     }
 
-    public List<String> getQbUserTags(int index) {
-        return qbUsersList.get(index).getTags();
+    public QBUser getQBUser(int userId) {
+        return qpUsersMap.get(userId);
     }
 
-    public QBUser getQBUser(int index) {
-        return qbUsersList.get(index);
-    }
-
-    public QBUser getLastQBUser() {
-        return qbUsersList.get(qbUsersList.size() - 1);
-    }
-
-    public void addQbUserToList(QBUser qbUser) {
-        qbUsersList.add(qbUser);
+    public void addQbUserToList(int userId, QBUser qbUser) {
+        qpUsersMap.put(userId,qbUser);
     }
 
     public QBUser getSignInQbUser() {
@@ -146,8 +120,8 @@ public class ApplicationSingleton {
         this.signInQbUser = singInQbUser;
     }
 
-    public String getSignInUserOldPassword() {
-        return signInQbUser.getOldPassword();
+    public String getSignInUserPassword() {
+        return signInQbUser.getPassword();
     }
 
     public int getSignInUserId() {
@@ -162,20 +136,8 @@ public class ApplicationSingleton {
         return signInQbUser.getLogin();
     }
 
-    public String getSignInUserEmail() {
-        return signInQbUser.getEmail();
-    }
-
     public String getSignInUserFullName() {
         return signInQbUser.getFullName();
-    }
-
-    public String getSignInUserPhone() {
-        return signInQbUser.getPhone();
-    }
-
-    public String getSignInUserWebSite() {
-        return signInQbUser.getWebsite();
     }
 
 }
