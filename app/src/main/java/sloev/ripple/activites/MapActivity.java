@@ -50,16 +50,22 @@ import sloev.ripple.model.LocationData;
 import sloev.ripple.util.ApplicationSingleton;
 import sloev.ripple.util.DialogUtils;
 
+import android.os.Handler;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import sloev.ripple.model.UserDataStructure;
 /*
-* TODO: implement: http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
+* based on http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
+* and location example from quickblox sdk
+*
+*
+* mulige løsninger på trouble in mainthread:
+* måske har dte noget at gøre med at google maps bliver tilføjet markers fra privatechatmanagers inititativ
+* måske er det noget med at jeg kører en timer ogen handler.
+*
  */
 
 public class MapActivity extends ActionBarActivity implements ChatListener, LocationListener {
@@ -72,11 +78,17 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     private Resources resources;
     private GoogleMap googleMap;
     private Location lastLocation;
-    private Map<Marker, LocationData> storageMap = new HashMap<Marker, LocationData>();
+    //private Map<Marker, LocationData> storageMap = new HashMap<Marker, LocationData>();
+    private Map<Integer, Marker> userMarkers = new HashMap<Integer, Marker>();
     private Marker myMarker;
     private DialogInterface.OnClickListener checkInPositiveButton;
     private DialogInterface.OnClickListener checkInNegativeButton;
 
+    private EditText userField;
+
+
+    Handler timerHandler;
+    Runnable timerRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,38 +98,45 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             @Override
             public void onGlobalLayout() {
                 mapLoaded = true;
-                //and write code, which you can see in answer above
             }
         });
 
 
         System.out.println("in map activity");
-        button = (Button) findViewById(R.id.button);
         dataholder = ApplicationSingleton.getDataHolder();
         dataholder.getPrivateChatManager().initChatListener();
+        dataholder.getPrivateChatManager().addListener(this);
 
+        userField = (EditText) findViewById(R.id.userField);
         initGooglePlayStatus();
 
+         timerHandler = new Handler();
+         timerRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                sendLocationToContacts();
+                timerHandler.postDelayed(this, 5000);
+            }
+        };
+        timerHandler.postDelayed(timerRunnable, 0);
+
     }
-    public void send(View v){
-
-        QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setBody("hello world");
-        chatMessage.setDateSent(new Date().getTime() / 1000);
+    public void sendLocationToContacts(){
         try {
-            /*
-            if (first) {
-                first = false;
-
-                dataholder.getPrivateChatManager().newChat(2526157);
-                dataholder.getPrivateChatManager().addListener(this);
-            }*/
-            dataholder.getPrivateChatManager().sendMessage(2526157, chatMessage);
-            System.out.println("message send");
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            for (UserDataStructure user : dataholder.getContacts()) {
+                if (user.isEnabled() & myMarker != null) {
+                    System.out.println("sending to user");
+                    dataholder.getPrivateChatManager().newChat(user.getUserId());
+                    dataholder.getPrivateChatManager().sendLatLng(user.getUserId(), myMarker.getPosition());
+                }else{
+                    System.out.println("not sending to user");
+                }
+            }
+        } catch (XMPPException e1) {
+            e1.printStackTrace();
+        } catch (SmackException.NotConnectedException e1) {
+            e1.printStackTrace();
         }
     }
 
@@ -145,8 +164,21 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     }
 
     @Override
-    public void gpsReceived(int userId, float lat, float lon) {
-        System.out.println("gpsRECEIVED" + userId + "," + lat + ", " + lon);
+    public void gpsReceived(int userId, LatLng position) {
+        System.out.println("gps RECEIVED:" + userId + " :" + position.latitude + ", " + position.longitude);
+        if(!dataholder.contactsContainsUser(userId)){
+            UserDataStructure userData = new UserDataStructure(userId, true);
+            dataholder.addUserToContacts(userId, userData);
+            System.out.println("user now in contacts:");
+        }
+        UserDataStructure userData = dataholder.getUserData(userId);
+        if (!userData.hasMarker()){
+            Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
+                    BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
+            marker.setTitle(Integer.toString(userId));
+            userData.setMarker(marker);
+        }
+        userData.setPosition(position);
     }
 
     private void initGooglePlayStatus() {
@@ -179,10 +211,8 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
                         if (marker.equals(myMarker)) {
                             message = "It is me";//resources.getString(R.string.dlg_it_is_me);
                         } else {
-                            LocationData data = storageMap.get(marker);
-                            message = "user:" + data.getUserName() +
-                                    " status:" + (data
-                                    .getUserStatus() != null ? data.getUserStatus() : "empty");
+                            UserDataStructure userData = dataholder.getUserData(Integer.parseInt(marker.getTitle()));
+                            message = "user:" + userData.getUserId();
                         }
                         DialogUtils.showLong(context, message);
                         return false;
@@ -191,16 +221,41 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             }
         }
     }
-    public CameraUpdate getCameraUpdate() {
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (Marker marker : storageMap.keySet()) {
-            builder.include(marker.getPosition());
-        }
-        builder.include(myMarker.getPosition());
-        LatLngBounds bounds = builder.build();
+
+    public CameraUpdate getCameraUpdate(double maxZoom) {
+
+        LatLngBounds bounds = adjustBoundsForMaxZoomLevel(maxZoom);
         int padding = 100; // offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         return cu;
+    }
+
+    private LatLngBounds adjustBoundsForMaxZoomLevel(double zoomN) {
+        //based on http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (UserDataStructure userData : dataholder.getContacts()) {
+            if(userData.isEnabled() & userData.hasMarker()) {
+                builder.include(userData.getPosition());
+            }
+        }
+        builder.include(myMarker.getPosition());
+        LatLngBounds bounds = builder.build();
+
+        LatLng sw = bounds.southwest;
+        LatLng ne = bounds.northeast;
+        double deltaLat = Math.abs(sw.latitude - ne.latitude);
+        double deltaLon = Math.abs(sw.longitude - ne.longitude);
+
+        if (deltaLat < zoomN) {
+            sw = new LatLng(sw.latitude - (zoomN - deltaLat / 2), sw.longitude);
+            ne = new LatLng(ne.latitude + (zoomN - deltaLat / 2), ne.longitude);
+            bounds = new LatLngBounds(sw, ne);
+        } else if (deltaLon < zoomN) {
+            sw = new LatLng(sw.latitude, sw.longitude - (zoomN - deltaLon / 2));
+            ne = new LatLng(ne.latitude, ne.longitude + (zoomN - deltaLon / 2));
+            bounds = new LatLngBounds(sw, ne);
+        }
+        return bounds;
     }
 
     private void initLocationManager() {
@@ -213,6 +268,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         }
         locationManager.requestLocationUpdates(provider, 20000, 0, this);//Constants.LOCATION_MIN_TIME, 0, this);
     }
+
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
@@ -227,6 +283,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     public void onProviderDisabled(String provider) {
 
     }
+
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
@@ -242,10 +299,25 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         } else {
             myMarker.setPosition(latLng);
         }
-        if(mapLoaded) {
+    }
 
-            googleMap.animateCamera(getCameraUpdate());
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(1));
+    public void focus(View v) {
+        if (mapLoaded) {
+            googleMap.animateCamera(getCameraUpdate(0.001));
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    public void addUserToContacts(View v){
+        int userId = Integer.parseInt(userField.getText().toString());
+        UserDataStructure userData = new UserDataStructure(userId, true);
+        dataholder.addUserToContacts(userId, userData);
+        System.out.println("user added to contacts");
+    }
+
 }

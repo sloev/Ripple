@@ -3,29 +3,23 @@ package sloev.ripple.util;
 
 import android.content.SharedPreferences;
 import android.content.Context;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
+import android.os.DropBoxManager;
 
-import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.listeners.QBRosterListener;
 import com.quickblox.users.model.QBUser;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.json.*;
-import sloev.ripple.R;
-import sloev.ripple.chat.PrivateChatManager;
-import sloev.ripple.users.UserStructure;
 
+import sloev.ripple.chat.PrivateChatManager;
+import sloev.ripple.model.UserDataStructure;
 /**
  * Created by johannes on 09/03/15.
  * based on DataHolder from com.quickblox.sample.user.helper;
@@ -37,14 +31,10 @@ public class ApplicationSingleton {
     public static final String USERS = "users";
     public static final String SIGNED_IN_USER = "user";
 
-
-
-
     private static ApplicationSingleton dataHolder;
-    private Map<Integer, QBUser> qpUsersMap = new HashMap<Integer, QBUser>();
 
-    private Map<Integer, UserStructure> userExtrasMap = new HashMap<Integer, UserStructure>();
-
+    private Map<Integer, UserDataStructure> userContacts = new HashMap<Integer, UserDataStructure>();
+    private List<UserDataStructure> enabledContacts = new ArrayList<UserDataStructure>();
     private QBUser signInQbUser;
 
 
@@ -65,7 +55,7 @@ public class ApplicationSingleton {
         this.privateChatManager = privateChatManager;
     }
 
-    public void loadUsersFromPreferences(Context context) throws JSONException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public void loadContactMap(Context context) throws JSONException, InvalidKeySpecException, NoSuchAlgorithmException {
         SharedPreferences settings = context.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
         //fp fat pp signed in user
         String jsonString = settings.getString(SIGNED_IN_USER, "");
@@ -93,29 +83,25 @@ public class ApplicationSingleton {
 
     }
 
-    public void saveUsersToPreferences(Context context){
+    public void saveContactMap(Context context){
         //map.get("dog")
     }
-    public String getQBUserName(int userId) {
-        return qpUsersMap.get(userId).getFullName();
+    public Collection<UserDataStructure> getContacts(){
+        return userContacts.values();
     }
 
-    public List<String> getQbUserTags(int userId) {
-        return qpUsersMap.get(userId).getTags();
+    public boolean contactsContainsUser(int userId){
+        return userContacts.containsKey(userId);
+    }
+    public boolean userIsEnabled(int userId){
+        return userContacts.get(userId).isEnabled();
+    }
+    public UserDataStructure getUserData(int userId) {
+        return userContacts.get(userId);
     }
 
-    public boolean containsQBUser(int userId){
-        return qpUsersMap.containsKey(userId);
-    }
-    public boolean qbuserIsEnabled(int userId){
-        return userExtrasMap.get(userId).isEnabled();
-    }
-    public QBUser getQBUser(int userId) {
-        return qpUsersMap.get(userId);
-    }
-
-    public void addQbUserToList(int userId, QBUser qbUser) {
-        qpUsersMap.put(userId,qbUser);
+    public void addUserToContacts(int userId, UserDataStructure userData) {
+        userContacts.put(userId, userData);
     }
 
     public QBUser getSignInQbUser() {
@@ -130,20 +116,15 @@ public class ApplicationSingleton {
         return signInQbUser.getPassword();
     }
 
+    public void setSignInUserPassword(String singInUserPassword) {
+        signInQbUser.setPassword(singInUserPassword);
+    }
     public int getSignInUserId() {
         return signInQbUser.getId();
     }
 
-    public void setSignInUserPassword(String singInUserPassword) {
-        signInQbUser.setPassword(singInUserPassword);
-    }
-
     public String getSignInUserLogin() {
         return signInQbUser.getLogin();
-    }
-
-    public String getSignInUserFullName() {
-        return signInQbUser.getFullName();
     }
 
 }

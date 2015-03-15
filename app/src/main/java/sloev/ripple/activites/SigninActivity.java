@@ -31,6 +31,7 @@ import sloev.ripple.util.DialogUtils;
 public class SigninActivity extends ActionBarActivity {
     private ApplicationSingleton dataholder;
     private EditText passwordField;
+    private EditText userName;
     private TextView fingerprintView;
     private SharedPreferences settings;
     private String loginName;
@@ -45,12 +46,13 @@ public class SigninActivity extends ActionBarActivity {
         SharedPreferences settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
 
         dataholder = ApplicationSingleton.getDataHolder();
-        fingerprintView = (TextView) findViewById(R.id.fingerprintView);
+        //fingerprintView = (TextView) findViewById(R.id.fingerprintView);
         loginName = "bot";//(String) settings.getString("loginFingerPrint", "");
-        fingerprintView.setText(loginName);
+        //fingerprintView.setText(loginName);
 
 
         passwordField = (EditText) findViewById(R.id.passwordField);
+        userName = (EditText) findViewById(R.id.userName);
 
     }
 
@@ -78,7 +80,7 @@ public class SigninActivity extends ActionBarActivity {
     }
 
     public void signIn(View v){
-        QBUser qbUser = new QBUser(loginName, passwordField.getText().toString());
+        QBUser qbUser = new QBUser(userName.getText().toString(), passwordField.getText().toString());
         QBUsers.signIn(qbUser, new QBEntityCallbackImpl<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
@@ -133,7 +135,8 @@ public class SigninActivity extends ActionBarActivity {
                     chatService.startAutoSendPresence(30);
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
-                }                Intent intent = new Intent(context, MapActivity.class);
+                }
+                Intent intent = new Intent(context, MapActivity.class);
                 startActivity(intent);
 
                 finish();

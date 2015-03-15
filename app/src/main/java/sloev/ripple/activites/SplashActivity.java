@@ -59,12 +59,15 @@ public class SplashActivity extends Activity {
         boolean signedUp = settings.getBoolean("signedUp", false);
 
         Intent intent;
+        //TODO: remove . kun i debug
+        intent = new Intent(this, SigninActivity.class);
+/*
         if (signedUp){
             intent = new Intent(this, SigninActivity.class);
             System.out.println("signed up allready");
         }else{
             intent = new Intent(this, SignupActivity.class);
-        }
+        }*/
         startActivity(intent);
     }
 

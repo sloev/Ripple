@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
@@ -80,15 +81,17 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     }
 
     public void newChat(int opponentID){
-        // init private chat
-        //
-        QBPrivateChat privateChat = privateChatManager.getChat(opponentID);
-        if (privateChat == null) {
-            privateChat = privateChatManager.createChat(opponentID, this);
-        } else {
-            privateChat.addMessageListener(this);
+        if(!privateChats.containsKey(opponentID)) {
+            // init private chat
+            //
+            QBPrivateChat privateChat = privateChatManager.getChat(opponentID);
+            if (privateChat == null) {
+                privateChat = privateChatManager.createChat(opponentID, this);
+            } else {
+                privateChat.addMessageListener(this);
+            }
+            privateChats.put(opponentID, privateChat);
         }
-        privateChats.put(opponentID, privateChat);
     }
     public void removeChat(int opponentID){
         privateChats.remove(opponentID);
@@ -109,10 +112,10 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     }
 
     @Override
-    public void sendLatLon(int opponentID, float lat, float lon) throws XMPPException, SmackException.NotConnectedException {
+    public void sendLatLng(int opponentID, LatLng position) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = new QBChatMessage();
-        String floatStr = Float.toString(lat) + " " + Float.toString(lon);
-        chatMessage.setBody(floatStr);
+        String message = Double.toString(position.latitude) + " " + Double.toString(position.longitude);
+        chatMessage.setBody(message);
         privateChats.get(opponentID).sendMessage(chatMessage);
     }
 
@@ -128,12 +131,13 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     public void processMessage(QBPrivateChat chat, QBChatMessage message) {
         //gets user id
         int userId =  chat.getParticipant();
-        String[] floatStr = message.getBody().split(" ");
-        float lat = Float.parseFloat(floatStr[0]);
-        float lon = Float.parseFloat(floatStr[1]);
+        String[] positionStr = message.getBody().split(" ");
+        double lat = Double.parseDouble(positionStr[0]);
+        double lon = Double.parseDouble(positionStr[1]);
+        LatLng position = new LatLng(lat, lon);
         // Notify everybody that may be interested.
         for (ChatListener hl : listeners)
-            hl.gpsReceived(userId, lat, lon);
+            hl.gpsReceived(userId, position);
     }
 
     @Override
@@ -145,7 +149,7 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     public void chatCreated(QBPrivateChat incomingPrivateChat, boolean createdLocally) {
         if (!createdLocally) {
             int opponentID = incomingPrivateChat.getParticipant();
-            if (dataholder.containsQBUser(opponentID)){
+            if (dataholder.contactsContainsUser(opponentID)){
                 System.out.println(String.format("USER %d ”IS IN CONTACTS", opponentID));
             }
             incomingPrivateChat.addMessageListener(PrivateChatManager.this);
