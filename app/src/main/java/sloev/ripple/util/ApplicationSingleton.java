@@ -43,7 +43,7 @@ public class ApplicationSingleton {
     private static ApplicationSingleton dataHolder;
     private Map<Integer, QBUser> qpUsersMap = new HashMap<Integer, QBUser>();
 
-    private Map<String, UserStructure> map = new HashMap<String, UserStructure>();
+    private Map<Integer, UserStructure> userExtrasMap = new HashMap<Integer, UserStructure>();
 
     private QBUser signInQbUser;
 
@@ -104,6 +104,12 @@ public class ApplicationSingleton {
         return qpUsersMap.get(userId).getTags();
     }
 
+    public boolean containsQBUser(int userId){
+        return qpUsersMap.containsKey(userId);
+    }
+    public boolean qbuserIsEnabled(int userId){
+        return userExtrasMap.get(userId).isEnabled();
+    }
     public QBUser getQBUser(int userId) {
         return qpUsersMap.get(userId);
     }

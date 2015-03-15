@@ -8,6 +8,7 @@ import org.jivesoftware.smack.XMPPException;
 public interface ChatManager {
 
     void sendMessage(int opponentID, QBChatMessage message) throws XMPPException, SmackException.NotConnectedException;
+    void sendLatLon(int opponentID, float lat, float lon) throws XMPPException, SmackException.NotConnectedException;
 
     void release(int opponentId) throws XMPPException;
 }

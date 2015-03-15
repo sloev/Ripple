@@ -23,9 +23,12 @@ import org.jivesoftware.smack.XMPPException;
  */
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+
+import sloev.ripple.util.ApplicationSingleton;
 
 
 public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> implements ChatManager, QBPrivateChatManagerListener {
@@ -33,7 +36,7 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     private static final String TAG = "PrivateChatManagerImpl";
     private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
     private Context context;
-
+    ApplicationSingleton dataholder;
 
     private QBPrivateChatManager privateChatManager;
    // private QBPrivateChat privateChat;
@@ -45,6 +48,7 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
 
     public PrivateChatManager(Context context) {
         this.context = context;
+        dataholder = ApplicationSingleton.getDataHolder();
         this.initChatService();
 
     }
@@ -105,6 +109,14 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     }
 
     @Override
+    public void sendLatLon(int opponentID, float lat, float lon) throws XMPPException, SmackException.NotConnectedException {
+        QBChatMessage chatMessage = new QBChatMessage();
+        String floatStr = Float.toString(lat) + " " + Float.toString(lon);
+        chatMessage.setBody(floatStr);
+        privateChats.get(opponentID).sendMessage(chatMessage);
+    }
+
+    @Override
     public void release(int opponentId) {
         Log.w(TAG, "release private chat");
         for (QBPrivateChat hl : privateChats.values())
@@ -116,8 +128,9 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     public void processMessage(QBPrivateChat chat, QBChatMessage message) {
         //gets user id
         int userId =  chat.getParticipant();
-        float lat = new Float(1.1);
-        float lon = new Float(20.0);
+        String[] floatStr = message.getBody().split(" ");
+        float lat = Float.parseFloat(floatStr[0]);
+        float lon = Float.parseFloat(floatStr[1]);
         // Notify everybody that may be interested.
         for (ChatListener hl : listeners)
             hl.gpsReceived(userId, lat, lon);
@@ -132,6 +145,9 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     public void chatCreated(QBPrivateChat incomingPrivateChat, boolean createdLocally) {
         if (!createdLocally) {
             int opponentID = incomingPrivateChat.getParticipant();
+            if (dataholder.containsQBUser(opponentID)){
+                System.out.println(String.format("USER %d ”IS IN CONTACTS", opponentID));
+            }
             incomingPrivateChat.addMessageListener(PrivateChatManager.this);
             privateChats.put(opponentID, incomingPrivateChat);
         }
