@@ -52,6 +52,7 @@ import sloev.ripple.util.DialogUtils;
 
 import android.os.Handler;
 import android.widget.EditText;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -72,6 +73,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     Button button;
     ApplicationSingleton dataholder;
 
+    ToggleButton focusToggle;
     boolean mapLoaded = false;
 
     private Context context;
@@ -87,49 +89,53 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     private EditText userField;
 
 
-    Handler timerHandler;
-    Runnable timerRunnable;
+    Handler handler = new Handler();
+    Runnable sendGpsRunnable;
+    Runnable receiveGpsRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        findViewById(R.id.map_fragment).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                mapLoaded = true;
-            }
-        });
-
-
-        System.out.println("in map activity");
         dataholder = ApplicationSingleton.getDataHolder();
         dataholder.getPrivateChatManager().initChatListener();
         dataholder.getPrivateChatManager().addListener(this);
 
-        userField = (EditText) findViewById(R.id.userField);
-        initGooglePlayStatus();
-
-         timerHandler = new Handler();
-         timerRunnable = new Runnable() {
+        sendGpsRunnable = new Runnable() {
 
             @Override
             public void run() {
                 sendLocationToContacts();
-                timerHandler.postDelayed(this, 5000);
+                handler.postDelayed(this, 5000);
             }
         };
-        timerHandler.postDelayed(timerRunnable, 0);
+        focusToggle = (ToggleButton) findViewById(R.id.focusToggle);
+
+        initGooglePlayStatus();
+        findViewById(R.id.map_fragment).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!mapLoaded){
+                    focusToggle.setChecked(true);
+                    focusCamera();
+                }
+                mapLoaded = true;
+                handler.postDelayed(sendGpsRunnable, 0);
+            }
+        });
+
+        userField = (EditText) findViewById(R.id.userField);
 
     }
-    public void sendLocationToContacts(){
+
+    public void sendLocationToContacts() {
         try {
             for (UserDataStructure user : dataholder.getContacts()) {
                 if (user.isEnabled() & myMarker != null) {
                     System.out.println("sending to user");
                     dataholder.getPrivateChatManager().newChat(user.getUserId());
                     dataholder.getPrivateChatManager().sendLatLng(user.getUserId(), myMarker.getPosition());
-                }else{
+                } else {
                     System.out.println("not sending to user");
                 }
             }
@@ -164,21 +170,35 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     }
 
     @Override
-    public void gpsReceived(int userId, LatLng position) {
-        System.out.println("gps RECEIVED:" + userId + " :" + position.latitude + ", " + position.longitude);
-        if(!dataholder.contactsContainsUser(userId)){
-            UserDataStructure userData = new UserDataStructure(userId, true);
-            dataholder.addUserToContacts(userId, userData);
-            System.out.println("user now in contacts:");
-        }
-        UserDataStructure userData = dataholder.getUserData(userId);
-        if (!userData.hasMarker()){
-            Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
-                    BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
-            marker.setTitle(Integer.toString(userId));
-            userData.setMarker(marker);
-        }
-        userData.setPosition(position);
+    public void gpsReceived(final int userId, final LatLng position) {
+
+        receiveGpsRunnable = new Runnable() {
+            @Override
+            public void run() {
+                {
+                    System.out.println("gps RECEIVED:" + userId + " :" + position.latitude + ", " + position.longitude);
+                    if (!dataholder.contactsContainsUser(userId)) {
+                        UserDataStructure userData = new UserDataStructure(userId, true);
+                        dataholder.addUserToContacts(userId, userData);
+                        System.out.println("user now in contacts:");
+                    }
+                    UserDataStructure userData = dataholder.getUserData(userId);
+                    if (!userData.hasMarker()) {
+                        Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
+                                BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
+                        marker.setTitle(Integer.toString(userId));
+                        userData.setMarker(marker);
+                    }
+                    userData.setPosition(position);
+                    if (focusToggle.isChecked()) {
+                        focusCamera();
+                    }
+                }
+            }
+        };
+
+        handler.post(receiveGpsRunnable);
+
     }
 
     private void initGooglePlayStatus() {
@@ -222,7 +242,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         }
     }
 
-    public CameraUpdate getCameraUpdate(double maxZoom) {
+    private CameraUpdate getCameraUpdate(double maxZoom) {
 
         LatLngBounds bounds = adjustBoundsForMaxZoomLevel(maxZoom);
         int padding = 100; // offset from edges of the map in pixels
@@ -234,7 +254,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         //based on http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (UserDataStructure userData : dataholder.getContacts()) {
-            if(userData.isEnabled() & userData.hasMarker()) {
+            if (userData.isEnabled() & userData.hasMarker()) {
                 builder.include(userData.getPosition());
             }
         }
@@ -295,29 +315,39 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             myMarker = googleMap.addMarker(new MarkerOptions().position(latLng).icon(
                     BitmapDescriptorFactory.fromResource(R.drawable.map_marker_my)));
 
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            //googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         } else {
             myMarker.setPosition(latLng);
+        }
+        if (focusToggle.isChecked()) {
+            focusCamera();
         }
     }
 
     public void focus(View v) {
-        if (mapLoaded) {
-            googleMap.animateCamera(getCameraUpdate(0.001));
+        if (focusToggle.isChecked()) {
+            if (mapLoaded) {
+                focusCamera();
+            }
         }
+        //focusToggle.toggle();
+    }
+
+    private void focusCamera() {
+        googleMap.animateCamera(getCameraUpdate(0.001));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        timerHandler.removeCallbacks(timerRunnable);
+        handler.removeCallbacks(sendGpsRunnable);
+        handler.removeCallbacks(receiveGpsRunnable);
     }
 
-    public void addUserToContacts(View v){
+    public void addUserToContacts(View v) {
         int userId = Integer.parseInt(userField.getText().toString());
         UserDataStructure userData = new UserDataStructure(userId, true);
         dataholder.addUserToContacts(userId, userData);
         System.out.println("user added to contacts");
     }
-
 }

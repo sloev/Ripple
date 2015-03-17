@@ -10,17 +10,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="focus"
-        android:id="@+id/focusbutton"
-        android:layout_alignTop="@+id/map_fragment"
-        android:layout_alignRight="@+id/map_fragment"
-        android:layout_alignEnd="@+id/map_fragment"
-        android:onClick="focus" />
-
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,8 +26,23 @@
         android:layout_height="wrap_content"
         android:text="add"
         android:id="@+id/addUser"
+        android:onClick="addUserToContacts"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/focusbutton"
-        android:layout_toStartOf="@+id/focusbutton"
-        android:onClick="addUserToContacts" />
+        android:layout_toLeftOf="@+id/focusToggle"
+        android:layout_toStartOf="@+id/focusToggle" />
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="focus"
+        android:id="@+id/focusToggle"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:checked="false"
+        android:singleLine="false"
+        android:textOn="focus on"
+        android:textOff="focus off"
+        android:layout_alignBottom="@+id/addUser"
+        android:onClick="focus" />
+
 </RelativeLayout>
