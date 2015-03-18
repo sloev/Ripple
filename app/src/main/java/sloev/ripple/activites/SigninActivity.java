@@ -24,6 +24,7 @@ import java.util.List;
 
 import sloev.ripple.R;
 import sloev.ripple.chat.PrivateChatManager;
+import sloev.ripple.model.UserDataStructure;
 import sloev.ripple.util.ApplicationSingleton;
 import sloev.ripple.util.DialogUtils;
 
@@ -88,6 +89,12 @@ public class SigninActivity extends ActionBarActivity {
                 setResult(RESULT_OK);
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(passwordField.getText().toString());
+                int userId = qbUser.getId();
+                if (!dataholder.contactsContainsUser(userId)) {
+                    UserDataStructure userData = new UserDataStructure(userId, true);
+                    dataholder.addUserToContacts(userId, userData);
+                    System.out.println("login user now in contacts:");
+                }
                 signinSuccess();
                 //finish();
 

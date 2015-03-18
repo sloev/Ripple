@@ -58,6 +58,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import sloev.ripple.model.UserDataStructure;
+import sloev.ripple.util.MapCamera;
 /*
 * based on http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
 * and location example from quickblox sdk
@@ -82,7 +83,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     private Location lastLocation;
     //private Map<Marker, LocationData> storageMap = new HashMap<Marker, LocationData>();
     private Map<Integer, Marker> userMarkers = new HashMap<Integer, Marker>();
-    private Marker myMarker;
+    private Marker myMarker = null;
     private DialogInterface.OnClickListener checkInPositiveButton;
     private DialogInterface.OnClickListener checkInNegativeButton;
 
@@ -92,6 +93,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     Handler handler = new Handler();
     Runnable sendGpsRunnable;
     Runnable receiveGpsRunnable;
+    MapCamera camera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +102,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         dataholder = ApplicationSingleton.getDataHolder();
         dataholder.getPrivateChatManager().initChatListener();
         dataholder.getPrivateChatManager().addListener(this);
+        camera = new MapCamera();
 
         sendGpsRunnable = new Runnable() {
 
@@ -110,21 +113,20 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             }
         };
         focusToggle = (ToggleButton) findViewById(R.id.focusToggle);
+        userField = (EditText) findViewById(R.id.userField);
 
         initGooglePlayStatus();
         findViewById(R.id.map_fragment).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if (!mapLoaded){
+             /*   if (!mapLoaded){
                     focusToggle.setChecked(true);
-                    focusCamera();
-                }
+                }*/
                 mapLoaded = true;
                 handler.postDelayed(sendGpsRunnable, 0);
             }
         });
 
-        userField = (EditText) findViewById(R.id.userField);
 
     }
 
@@ -242,42 +244,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         }
     }
 
-    private CameraUpdate getCameraUpdate(double maxZoom) {
-
-        LatLngBounds bounds = adjustBoundsForMaxZoomLevel(maxZoom);
-        int padding = 100; // offset from edges of the map in pixels
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        return cu;
-    }
-
-    private LatLngBounds adjustBoundsForMaxZoomLevel(double zoomN) {
-        //based on http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (UserDataStructure userData : dataholder.getContacts()) {
-            if (userData.isEnabled() & userData.hasMarker()) {
-                builder.include(userData.getPosition());
-            }
-        }
-        builder.include(myMarker.getPosition());
-        LatLngBounds bounds = builder.build();
-
-        LatLng sw = bounds.southwest;
-        LatLng ne = bounds.northeast;
-        double deltaLat = Math.abs(sw.latitude - ne.latitude);
-        double deltaLon = Math.abs(sw.longitude - ne.longitude);
-
-        if (deltaLat < zoomN) {
-            sw = new LatLng(sw.latitude - (zoomN - deltaLat / 2), sw.longitude);
-            ne = new LatLng(ne.latitude + (zoomN - deltaLat / 2), ne.longitude);
-            bounds = new LatLngBounds(sw, ne);
-        } else if (deltaLon < zoomN) {
-            sw = new LatLng(sw.latitude, sw.longitude - (zoomN - deltaLon / 2));
-            ne = new LatLng(ne.latitude, ne.longitude + (zoomN - deltaLon / 2));
-            bounds = new LatLngBounds(sw, ne);
-        }
-        return bounds;
-    }
-
     private void initLocationManager() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -315,13 +281,15 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             myMarker = googleMap.addMarker(new MarkerOptions().position(latLng).icon(
                     BitmapDescriptorFactory.fromResource(R.drawable.map_marker_my)));
 
-            //googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            UserDataStructure userData = dataholder.getSignInUserData();
+            userData.setMarker(myMarker);
         } else {
             myMarker.setPosition(latLng);
+            if (focusToggle.isChecked()) {
+                focusCamera();
+            }
         }
-        if (focusToggle.isChecked()) {
-            focusCamera();
-        }
+
     }
 
     public void focus(View v) {
@@ -334,7 +302,11 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     }
 
     private void focusCamera() {
-        googleMap.animateCamera(getCameraUpdate(0.001));
+        if (myMarker == null) {
+            System.out.println("cant focus/zoom since lacking gps self");
+        } else {
+            googleMap.animateCamera(camera.zoomIn());//default zoom=0.001
+        }
     }
 
     @Override

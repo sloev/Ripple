@@ -38,6 +38,7 @@ public class ApplicationSingleton {
     private QBUser signInQbUser;
 
 
+
     private PrivateChatManager privateChatManager;
 
     public static synchronized ApplicationSingleton getDataHolder() {
@@ -102,6 +103,10 @@ public class ApplicationSingleton {
 
     public void addUserToContacts(int userId, UserDataStructure userData) {
         userContacts.put(userId, userData);
+    }
+
+    public UserDataStructure getSignInUserData(){
+        return userContacts.get(signInQbUser.getId());
     }
 
     public QBUser getSignInQbUser() {
