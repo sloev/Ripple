@@ -76,6 +76,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
 
     ToggleButton focusToggle;
     boolean mapLoaded = false;
+    int gpsRefreshRateMs = 15000;
 
     private Context context;
     private Resources resources;
@@ -93,6 +94,8 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     Handler handler = new Handler();
     Runnable sendGpsRunnable;
     Runnable receiveGpsRunnable;
+    ViewTreeObserver.OnGlobalLayoutListener mapLoadedObserver;
+
     MapCamera camera;
 
     @Override
@@ -109,36 +112,37 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             @Override
             public void run() {
                 sendLocationToContacts();
-                handler.postDelayed(this, 5000);
+                handler.postDelayed(this, gpsRefreshRateMs);
             }
         };
         focusToggle = (ToggleButton) findViewById(R.id.focusToggle);
         userField = (EditText) findViewById(R.id.userField);
 
         initGooglePlayStatus();
-        findViewById(R.id.map_fragment).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        mapLoadedObserver = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-             /*   if (!mapLoaded){
-                    focusToggle.setChecked(true);
-                }*/
+                handler.postDelayed(sendGpsRunnable, 0); //TODO: change so transmission only occurs if there is any friends to transmit to
                 mapLoaded = true;
-                handler.postDelayed(sendGpsRunnable, 0);
+                findViewById(R.id.map_fragment).getViewTreeObserver().removeOnGlobalLayoutListener(mapLoadedObserver);
             }
-        });
+        };
+        findViewById(R.id.map_fragment).getViewTreeObserver().addOnGlobalLayoutListener(mapLoadedObserver);
 
 
     }
 
     public void sendLocationToContacts() {
         try {
+            int signInUserId = dataholder.getSignInUserId();
             for (UserDataStructure user : dataholder.getContacts()) {
-                if (user.isEnabled() & myMarker != null) {
-                    System.out.println("sending to user");
+                int userId = user.getUserId();
+                if (user.isEnabled() & myMarker != null & user.getUserId()!= signInUserId) {
+                    System.out.println(String.format("sending to user:%d", userId));
                     dataholder.getPrivateChatManager().newChat(user.getUserId());
                     dataholder.getPrivateChatManager().sendLatLng(user.getUserId(), myMarker.getPosition());
                 } else {
-                    System.out.println("not sending to user");
+                    System.out.println(String.format("not sending to user:%d", userId));
                 }
             }
         } catch (XMPPException e1) {
@@ -200,7 +204,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         };
 
         handler.post(receiveGpsRunnable);
-
     }
 
     private void initGooglePlayStatus() {
@@ -252,7 +255,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         if (location != null) {
             onLocationChanged(location);
         }
-        locationManager.requestLocationUpdates(provider, 20000, 0, this);//Constants.LOCATION_MIN_TIME, 0, this);
+        locationManager.requestLocationUpdates(provider, gpsRefreshRateMs, 0, this);//Constants.LOCATION_MIN_TIME, 0, this);
     }
 
     @Override
@@ -298,7 +301,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
                 focusCamera();
             }
         }
-        //focusToggle.toggle();
     }
 
     private void focusCamera() {

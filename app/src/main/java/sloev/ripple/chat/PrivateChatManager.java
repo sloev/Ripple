@@ -131,13 +131,18 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     public void processMessage(QBPrivateChat chat, QBChatMessage message) {
         //gets user id
         int userId =  chat.getParticipant();
-        String[] positionStr = message.getBody().split(" ");
-        double lat = Double.parseDouble(positionStr[0]);
-        double lon = Double.parseDouble(positionStr[1]);
-        LatLng position = new LatLng(lat, lon);
-        // Notify everybody that may be interested.
-        for (ChatListener hl : listeners)
-            hl.gpsReceived(userId, position);
+        if (userId == dataholder.getSignInUserId()){
+            System.err.println("received message from self, ignoring");
+        }else {
+            String[] positionStr = message.getBody().split(" ");
+            double lat = Double.parseDouble(positionStr[0]);
+            double lon = Double.parseDouble(positionStr[1]);
+            LatLng position = new LatLng(lat, lon);
+            // Notify everybody that may be interested.
+            for (ChatListener hl : listeners) {
+                hl.gpsReceived(userId, position);
+            }
+        }
     }
 
     @Override

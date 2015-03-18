@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="integer" name="GPS_REFRESH_RATE_MS" format="integer">15000</item>
+</resources>
