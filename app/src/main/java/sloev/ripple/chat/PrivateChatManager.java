@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
@@ -29,6 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import sloev.ripple.R;
+import sloev.ripple.model.UserDataStructure;
 import sloev.ripple.util.ApplicationSingleton;
 
 
@@ -40,7 +45,7 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     ApplicationSingleton dataholder;
 
     private QBPrivateChatManager privateChatManager;
-   // private QBPrivateChat privateChat;
+    // private QBPrivateChat privateChat;
 
     private List<ChatListener> listeners = new ArrayList<ChatListener>();
     private Map<Integer, QBPrivateChat> privateChats = new HashMap<Integer, QBPrivateChat>();
@@ -53,23 +58,24 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
         this.initChatService();
 
     }
-    private void initChatService(){
+
+    private void initChatService() {
         QBChatService.setDebugEnabled(false);
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
         }
     }
-    public QBChatService getChatService(){
+
+    public QBChatService getChatService() {
         return QBChatService.getInstance();
     }
 
 
-    public void initChatListener(){
+    public void initChatListener() {
         privateChatManager = this.getChatService().getPrivateChatManager();
         privateChatManager.addPrivateChatManagerListener(this);
         System.out.println("CHATINITIALIZED");
     }
-
 
 
     public void sendPresencesPeriodically() {
@@ -80,8 +86,8 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
         }
     }
 
-    public void newChat(int opponentID){
-        if(!privateChats.containsKey(opponentID)) {
+    public void newChat(int opponentID) {
+        if (!privateChats.containsKey(opponentID)) {
             // init private chat
             //
             QBPrivateChat privateChat = privateChatManager.getChat(opponentID);
@@ -93,7 +99,8 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
             privateChats.put(opponentID, privateChat);
         }
     }
-    public void removeChat(int opponentID){
+
+    public void removeChat(int opponentID) {
         privateChats.remove(opponentID);
 
     }
@@ -130,14 +137,16 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     @Override
     public void processMessage(QBPrivateChat chat, QBChatMessage message) {
         //gets user id
-        int userId =  chat.getParticipant();
-        if (userId == dataholder.getSignInUserId()){
+        int userId = chat.getParticipant();
+        if (userId == dataholder.getSignInUserId()) {
             System.err.println("received message from self, ignoring");
-        }else {
+        } else {
+            //compute position
             String[] positionStr = message.getBody().split(" ");
             double lat = Double.parseDouble(positionStr[0]);
             double lon = Double.parseDouble(positionStr[1]);
             LatLng position = new LatLng(lat, lon);
+
             // Notify everybody that may be interested.
             for (ChatListener hl : listeners) {
                 hl.gpsReceived(userId, position);
@@ -145,22 +154,23 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
         }
     }
 
-    @Override
-    public void processError(QBPrivateChat chat, QBChatException error, QBChatMessage originChatMessage) {
+        @Override
+        public void processError (QBPrivateChat chat, QBChatException error, QBChatMessage
+        originChatMessage){
 
-    }
-
-    @Override
-    public void chatCreated(QBPrivateChat incomingPrivateChat, boolean createdLocally) {
-        if (!createdLocally) {
-            int opponentID = incomingPrivateChat.getParticipant();
-            if (dataholder.contactsContainsUser(opponentID)){
-                System.out.println(String.format("USER %d ”IS IN CONTACTS", opponentID));
-            }
-            incomingPrivateChat.addMessageListener(PrivateChatManager.this);
-            privateChats.put(opponentID, incomingPrivateChat);
         }
 
+        @Override
+        public void chatCreated (QBPrivateChat incomingPrivateChat,boolean createdLocally){
+            if (!createdLocally) {
+                int opponentID = incomingPrivateChat.getParticipant();
+                if (dataholder.contactsContainsUser(opponentID)) {
+                    System.out.println(String.format("USER %d ”IS IN CONTACTS", opponentID));
+                }
+                incomingPrivateChat.addMessageListener(PrivateChatManager.this);
+                privateChats.put(opponentID, incomingPrivateChat);
+            }
+
 //        Log.w(TAG, "private chat created: " + incomingPrivateChat.getParticipant() + ", createdLocally:" + createdLocally);
+        }
     }
-}

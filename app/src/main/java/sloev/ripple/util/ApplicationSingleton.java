@@ -98,7 +98,11 @@ public class ApplicationSingleton {
         return userContacts.get(userId).isEnabled();
     }
     public UserDataStructure getUserData(int userId) {
-        return userContacts.get(userId);
+        if(!contactsContainsUser(userId)){
+            return null;
+        }else {
+            return userContacts.get(userId);
+        }
     }
 
     public void addUserToContacts(int userId, UserDataStructure userData) {

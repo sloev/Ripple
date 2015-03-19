@@ -81,12 +81,9 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     private Context context;
     private Resources resources;
     private GoogleMap googleMap;
-    private Location lastLocation;
     //private Map<Marker, LocationData> storageMap = new HashMap<Marker, LocationData>();
-    private Map<Integer, Marker> userMarkers = new HashMap<Integer, Marker>();
+    //private Map<Integer, Marker> userMarkers = new HashMap<Integer, Marker>();
     private Marker myMarker = null;
-    private DialogInterface.OnClickListener checkInPositiveButton;
-    private DialogInterface.OnClickListener checkInNegativeButton;
 
     private EditText userField;
 
@@ -183,12 +180,14 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             public void run() {
                 {
                     System.out.println("gps RECEIVED:" + userId + " :" + position.latitude + ", " + position.longitude);
-                    if (!dataholder.contactsContainsUser(userId)) {
-                        UserDataStructure userData = new UserDataStructure(userId, true);
+
+                    UserDataStructure userData = dataholder.getUserData(userId);
+
+                    if (userData == null) {
+                        userData = new UserDataStructure(userId, true);
                         dataholder.addUserToContacts(userId, userData);
                         System.out.println("user now in contacts:");
                     }
-                    UserDataStructure userData = dataholder.getUserData(userId);
                     if (!userData.hasMarker()) {
                         Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
                                 BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
@@ -205,7 +204,27 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
 
         handler.post(receiveGpsRunnable);
     }
+/*
+    public void userEmerged(){
+        receiveGpsRunnable = new Runnable() {
+            @Override
+            public void run() {
 
+                UserDataStructure userData = dataholder.getUserData(userId);
+
+        if (userData == null) {
+            UserDataStructure userData = new UserDataStructure(userId, true);
+            dataholder.addUserToContacts(userId, userData);
+            System.out.println("user now in contacts:");
+        }
+        if (!userData.hasMarker()) {
+            Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
+                    BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
+            marker.setTitle(Integer.toString(userId));
+            userData.setMarker(marker);
+        }
+    }
+*/
     private void initGooglePlayStatus() {
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
@@ -275,7 +294,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
 
     @Override
     public void onLocationChanged(Location location) {
-        lastLocation = location;
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         LatLng latLng = new LatLng(latitude, longitude);

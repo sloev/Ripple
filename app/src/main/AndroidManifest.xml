@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="sloev.ripple" >
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -16,6 +17,7 @@
             android:label="@string/title_activity_splash" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -40,6 +42,11 @@
             android:value="AIzaSyD7UdDsB1Gv-9KOP_Phl7B_qwkXIFwuJH8" />
 
         <uses-library android:name="com.google.android.maps" />
+
+        <activity
+            android:name=".activites.MapActivityWithFragments"
+            android:label="@string/title_activity_map_activity_with_fragments" >
+        </activity>
     </application>
 
 </manifest>
