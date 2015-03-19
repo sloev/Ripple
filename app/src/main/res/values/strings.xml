@@ -13,5 +13,8 @@
     <string name="sign_in_refused">Wrong fingerprint or password!</string>
     <string name="sign_in_refused_sollution">Create new fingerprint instead?</string>
 
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 </resources>
