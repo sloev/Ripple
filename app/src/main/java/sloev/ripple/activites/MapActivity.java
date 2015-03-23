@@ -102,13 +102,17 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         @Override
         public void run() {
             {
+                if(mapLoaded){
                 googleMap.clear();
                 for (UserDataStructure userData : dataholder.getContacts()) {
-                    Marker marker = googleMap.addMarker(userData.getMarkerOptions());
+                    if(userData.hasGpsFix()) {
+                        Marker marker = googleMap.addMarker(userData.getMarkerOptions());
+                    }
                 }
                 if (focusToggle.isChecked()) {
                     focusCamera();
                 }
+            }
             }
         }
     };
@@ -141,7 +145,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         mapLoadedObserver = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                handler.postDelayed(sendGpsRunnable, 0); //TODO: change so transmission only occurs if there is any friends to transmit to
                 mapLoaded = true;
                 findViewById(R.id.map_fragment).getViewTreeObserver().removeOnGlobalLayoutListener(mapLoadedObserver);
             }
@@ -278,6 +281,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         userData.setPosition(position);
         if (!gotFirstFix) {
             gotFirstFix = true;
+            handler.postDelayed(sendGpsRunnable, 0); //TODO: change so transmission only occurs if there is any friends to transmit to
         }
         locationsUpdate();
 
