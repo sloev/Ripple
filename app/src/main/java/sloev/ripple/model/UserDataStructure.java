@@ -1,7 +1,9 @@
 package sloev.ripple.model;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.quickblox.users.model.QBUser;
 
 import java.math.BigInteger;
@@ -12,22 +14,28 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
+import sloev.ripple.R;
+
 /**
  * Created by johannes on 12/03/15.
  */
 public class UserDataStructure {
-
-
-    private Marker marker;
+    private LatLng position;
 
     private boolean enabled;
-
+    private String snippet;
+    private boolean isSignInUser;
     private int userId;
+    private boolean gpsFixed = false;
+
+    private int iconId;
 
     public UserDataStructure(int userId, boolean enabled){
         this.userId = userId;
         this.enabled = enabled;
-        marker = null;
+        position = null;
+        snippet = "";
+        setSignInUser(false);
     }
     public UserDataStructure(String serializedSelf){
         String[] chunks = serializedSelf.split(" ");
@@ -37,24 +45,32 @@ public class UserDataStructure {
     public String toString(){
         String serializedSelf = Boolean.toString(enabled) + " ";
         return serializedSelf;
-
     }
+
+    public boolean isSignInUser(){
+        return isSignInUser;
+    }
+    public void setSignInUser(boolean isSignInUser){
+        this.isSignInUser = isSignInUser;
+        if ( isSignInUser){
+            iconId = R.drawable.map_marker_my;
+        }else{
+            iconId = R.drawable.map_marker_other;
+        }
+    }
+
     public LatLng getPosition() {
-        return marker.getPosition();
+        return position;
     }
 
     public void setPosition(LatLng position) {
-        marker.setPosition(position);
+        if (! gpsFixed){
+            gpsFixed = true;
+        }
+        this.position = position;
     }
-    public Marker getMarker() {
-        return marker;
-    }
-    public boolean hasMarker() {
-        return marker != null;
-    }
-
-    public void setMarker(Marker marker) {
-        this.marker = marker;
+    public boolean hasGpsFix(){
+        return gpsFixed;
     }
     public int getUserId() {
         return userId;
@@ -63,11 +79,18 @@ public class UserDataStructure {
     public boolean isEnabled() {
         return enabled;
     }
-
+    public String getSnippet(){
+        return snippet;
+    }
     public void enable() {
         this.enabled = true;
     }
     public void disable() {
         this.enabled = false;
+    }
+
+    public MarkerOptions getMarkerOptions() {
+       return new MarkerOptions().position(position).icon(
+                BitmapDescriptorFactory.fromResource(iconId)).title(Integer.toString(userId)).snippet(snippet);
     }
 }

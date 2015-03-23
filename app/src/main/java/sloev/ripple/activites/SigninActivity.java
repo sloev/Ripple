@@ -92,6 +92,7 @@ public class SigninActivity extends ActionBarActivity {
                 int userId = qbUser.getId();
                 if (!dataholder.contactsContainsUser(userId)) {
                     UserDataStructure userData = new UserDataStructure(userId, true);
+                    userData.setSignInUser(true);
                     dataholder.addUserToContacts(userId, userData);
                     System.out.println("login user now in contacts:");
                 }

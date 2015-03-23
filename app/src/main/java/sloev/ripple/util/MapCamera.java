@@ -31,22 +31,22 @@ public class MapCamera {
 
     public CameraUpdate zoomIn(double maxZoom) {
         UserDataStructure signInUserData = dataholder.getSignInUserData();
-        if (!signInUserData.hasMarker()) {
+        if (!signInUserData.hasGpsFix()) {
             System.err.println("from:ZoomIn - sign in user has no marker");
             return null;
         } else {
-            Marker myMarker = signInUserData.getMarker();
 
             int padding = 100; // offset from edges of the map in pixels
 
             //based on http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
             builder = new LatLngBounds.Builder();
+            builder.include(signInUserData.getPosition());
+
             for (UserDataStructure userData : dataholder.getContacts()) {
-                if (userData.isEnabled() & userData.hasMarker()) {
+                if (userData.isEnabled() & userData.hasGpsFix()) {
                     builder.include(userData.getPosition());
                 }
             }
-            builder.include(myMarker.getPosition());
             LatLngBounds bounds = builder.build();
 
             sw = bounds.southwest;

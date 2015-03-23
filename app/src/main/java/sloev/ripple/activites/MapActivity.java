@@ -52,6 +52,7 @@ import sloev.ripple.util.DialogUtils;
 
 import android.os.Handler;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -83,9 +84,11 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     private GoogleMap googleMap;
     //private Map<Marker, LocationData> storageMap = new HashMap<Marker, LocationData>();
     //private Map<Integer, Marker> userMarkers = new HashMap<Integer, Marker>();
-    private Marker myMarker = null;
 
     private EditText userField;
+    private TextView useridField;
+
+    private boolean gotFirstFix = false;
 
 
     Handler handler = new Handler();
@@ -94,6 +97,22 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     ViewTreeObserver.OnGlobalLayoutListener mapLoadedObserver;
 
     MapCamera camera;
+
+    Runnable locationsUpdatedRunnable = new Runnable() {
+        @Override
+        public void run() {
+            {
+                googleMap.clear();
+                for (UserDataStructure userData : dataholder.getContacts()) {
+                    Marker marker = googleMap.addMarker(userData.getMarkerOptions());
+                }
+                if (focusToggle.isChecked()) {
+                    focusCamera();
+                }
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +133,9 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         };
         focusToggle = (ToggleButton) findViewById(R.id.focusToggle);
         userField = (EditText) findViewById(R.id.userField);
+        useridField = (TextView) findViewById(R.id.userIdField);
+        useridField.setText(Integer.toString(dataholder.getSignInUserId()));
+
 
         initGooglePlayStatus();
         mapLoadedObserver = new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -130,16 +152,24 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     }
 
     public void sendLocationToContacts() {
+        if(!dataholder.getSignInUserData().hasGpsFix()){
+            return;
+        }
         try {
-            int signInUserId = dataholder.getSignInUserId();
-            for (UserDataStructure user : dataholder.getContacts()) {
-                int userId = user.getUserId();
-                if (user.isEnabled() & myMarker != null & user.getUserId()!= signInUserId) {
-                    System.out.println(String.format("sending to user:%d", userId));
-                    dataholder.getPrivateChatManager().newChat(user.getUserId());
-                    dataholder.getPrivateChatManager().sendLatLng(user.getUserId(), myMarker.getPosition());
-                } else {
+            LatLng myPosition = dataholder.getSignInUserData().getPosition();
+
+
+            for (UserDataStructure userData : dataholder.getContacts()) {
+                int userId = userData.getUserId();
+
+                if (userData.isSignInUser()) {
                     System.out.println(String.format("not sending to user:%d", userId));
+                    continue;
+                } else {
+                    LatLng position = userData.getPosition();
+                    System.out.println(String.format("sending to user:%d", userId));
+                    dataholder.getPrivateChatManager().newChat(userId);
+                    dataholder.getPrivateChatManager().sendLatLng(userId, myPosition);
                 }
             }
         } catch (XMPPException e1) {
@@ -173,58 +203,10 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     }
 
     @Override
-    public void gpsReceived(final int userId, final LatLng position) {
-
-        receiveGpsRunnable = new Runnable() {
-            @Override
-            public void run() {
-                {
-                    System.out.println("gps RECEIVED:" + userId + " :" + position.latitude + ", " + position.longitude);
-
-                    UserDataStructure userData = dataholder.getUserData(userId);
-
-                    if (userData == null) {
-                        userData = new UserDataStructure(userId, true);
-                        dataholder.addUserToContacts(userId, userData);
-                        System.out.println("user now in contacts:");
-                    }
-                    if (!userData.hasMarker()) {
-                        Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
-                                BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
-                        marker.setTitle(Integer.toString(userId));
-                        userData.setMarker(marker);
-                    }
-                    userData.setPosition(position);
-                    if (focusToggle.isChecked()) {
-                        focusCamera();
-                    }
-                }
-            }
-        };
-
-        handler.post(receiveGpsRunnable);
+    public void locationsUpdate() {
+        handler.post(locationsUpdatedRunnable);
     }
-/*
-    public void userEmerged(){
-        receiveGpsRunnable = new Runnable() {
-            @Override
-            public void run() {
 
-                UserDataStructure userData = dataholder.getUserData(userId);
-
-        if (userData == null) {
-            UserDataStructure userData = new UserDataStructure(userId, true);
-            dataholder.addUserToContacts(userId, userData);
-            System.out.println("user now in contacts:");
-        }
-        if (!userData.hasMarker()) {
-            Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
-                    BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
-            marker.setTitle(Integer.toString(userId));
-            userData.setMarker(marker);
-        }
-    }
-*/
     private void initGooglePlayStatus() {
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
@@ -251,14 +233,8 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
                 googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                        String message;
-                        if (marker.equals(myMarker)) {
-                            message = "It is me";//resources.getString(R.string.dlg_it_is_me);
-                        } else {
-                            UserDataStructure userData = dataholder.getUserData(Integer.parseInt(marker.getTitle()));
-                            message = "user:" + userData.getUserId();
-                        }
-                        DialogUtils.showLong(context, message);
+                        UserDataStructure userData = dataholder.getUserData(Integer.parseInt(marker.getTitle()));
+                        DialogUtils.showLong(context, userData.getSnippet());
                         return false;
                     }
                 });
@@ -296,20 +272,14 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     public void onLocationChanged(Location location) {
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
+        LatLng position = new LatLng(latitude, longitude);
 
-        if (myMarker == null) {
-            myMarker = googleMap.addMarker(new MarkerOptions().position(latLng).icon(
-                    BitmapDescriptorFactory.fromResource(R.drawable.map_marker_my)));
-
-            UserDataStructure userData = dataholder.getSignInUserData();
-            userData.setMarker(myMarker);
-        } else {
-            myMarker.setPosition(latLng);
-            if (focusToggle.isChecked()) {
-                focusCamera();
-            }
+        UserDataStructure userData = dataholder.getSignInUserData();
+        userData.setPosition(position);
+        if (!gotFirstFix) {
+            gotFirstFix = true;
         }
+        locationsUpdate();
 
     }
 
@@ -322,10 +292,10 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     }
 
     private void focusCamera() {
-        if (myMarker == null) {
-            System.out.println("cant focus/zoom since lacking gps self");
-        } else {
+        if (gotFirstFix) {
             googleMap.animateCamera(camera.zoomIn());//default zoom=0.001
+        } else {
+            System.out.println("cant focus/zoom since lacking gps self");
         }
     }
 

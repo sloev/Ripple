@@ -147,12 +147,50 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
             double lon = Double.parseDouble(positionStr[1]);
             LatLng position = new LatLng(lat, lon);
 
+            UserDataStructure userData = dataholder.getUserData(userId);
+
+            if (userData == null) {
+                userData = new UserDataStructure(userId, true);
+                dataholder.addUserToContacts(userId, userData);
+                System.out.println("user added to contacts:");
+            }
+            userData.setPosition(position);
+
             // Notify everybody that may be interested.
             for (ChatListener hl : listeners) {
-                hl.gpsReceived(userId, position);
+                hl.locationsUpdate();
+               // hl.gpsReceived(userId, position);
             }
         }
     }
+    /*
+    receiveGpsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            {
+                System.out.println("gps RECEIVED:" + userId + " :" + position.latitude + ", " + position.longitude);
+
+                UserDataStructure userData = dataholder.getUserData(userId);
+
+                if (userData == null) {
+                    userData = new UserDataStructure(userId, true);
+                    dataholder.addUserToContacts(userId, userData);
+                    System.out.println("user now in contacts:");
+                }
+                if (!userData.hasMarker()) {
+                    Marker marker = googleMap.addMarker(new MarkerOptions().position(position).icon(
+                            BitmapDescriptorFactory.fromResource(R.drawable.map_marker_other)));
+                    marker.setTitle(Integer.toString(userId));
+                    userData.setMarker(marker);
+                }
+                userData.setPosition(position);
+                if (focusToggle.isChecked()) {
+                    focusCamera();
+                }
+            }
+        }
+    };
+    */
 
         @Override
         public void processError (QBPrivateChat chat, QBChatException error, QBChatMessage
