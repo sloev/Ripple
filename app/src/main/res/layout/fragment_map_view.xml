@@ -1,0 +1,21 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="sloev.ripple.fragments.MapViewFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="focus"
+        android:id="@+id/focusToggle"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:checked="true"
+        android:singleLine="false"
+        android:textOn="focus on"
+        android:textOff="focus off"
+        android:layout_alignBottom="@+id/addUser"
+        android:onClick="focus" />
+
+</FrameLayout>

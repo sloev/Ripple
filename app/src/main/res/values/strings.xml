@@ -16,6 +16,9 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_map_activity_with_fragments">MapActivityWithFragments</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="map_view_fragment">MapViewFragment</string>
+
 
 
 </resources>

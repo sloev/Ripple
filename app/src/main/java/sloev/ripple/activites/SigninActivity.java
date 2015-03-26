@@ -144,7 +144,7 @@ public class SigninActivity extends ActionBarActivity {
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(context, MapActivityWithFragments.class);
+                Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
 
                 finish();

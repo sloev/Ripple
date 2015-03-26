@@ -44,8 +44,8 @@
         <uses-library android:name="com.google.android.maps" />
 
         <activity
-            android:name=".activites.MapActivityWithFragments"
-            android:label="@string/title_activity_map_activity_with_fragments" >
+            android:name=".activites.MainActivity"
+            android:label="@string/title_activity_main" >
         </activity>
     </application>
 
