@@ -1,9 +1,7 @@
 package sloev.ripple.activites;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
@@ -19,34 +17,19 @@ import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
-import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.users.QBUsers;
-import com.quickblox.users.model.QBUser;
+
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 import sloev.ripple.R;
 import sloev.ripple.chat.ChatListener;
-import sloev.ripple.model.LocationData;
 import sloev.ripple.util.ApplicationSingleton;
 import sloev.ripple.util.DialogUtils;
 
@@ -54,9 +37,6 @@ import android.os.Handler;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.model.LatLngBounds;
 
 import sloev.ripple.model.UserDataStructure;
 import sloev.ripple.util.MapCamera;
@@ -82,8 +62,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     private Context context;
     private Resources resources;
     private GoogleMap googleMap;
-    //private Map<Marker, LocationData> storageMap = new HashMap<Marker, LocationData>();
-    //private Map<Integer, Marker> userMarkers = new HashMap<Integer, Marker>();
 
     private EditText userField;
     private TextView useridField;
@@ -92,8 +70,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
 
 
     Handler handler = new Handler();
-    Runnable sendGpsRunnable;
-    Runnable receiveGpsRunnable;
     ViewTreeObserver.OnGlobalLayoutListener mapLoadedObserver;
 
     MapCamera camera;
@@ -116,7 +92,14 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
             }
         }
     };
+    Runnable sendGpsRunnable = new Runnable() {
 
+        @Override
+        public void run() {
+            sendLocationToContacts();
+            handler.postDelayed(this, gpsRefreshRateMs);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,14 +110,7 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
         dataholder.getPrivateChatManager().addListener(this);
         camera = new MapCamera();
 
-        sendGpsRunnable = new Runnable() {
 
-            @Override
-            public void run() {
-                sendLocationToContacts();
-                handler.postDelayed(this, gpsRefreshRateMs);
-            }
-        };
         focusToggle = (ToggleButton) findViewById(R.id.focusToggle);
         userField = (EditText) findViewById(R.id.userField);
         useridField = (TextView) findViewById(R.id.userIdField);
@@ -307,7 +283,6 @@ public class MapActivity extends ActionBarActivity implements ChatListener, Loca
     public void onPause() {
         super.onPause();
         handler.removeCallbacks(sendGpsRunnable);
-        handler.removeCallbacks(receiveGpsRunnable);
     }
 
     public void addUserToContacts(View v) {
