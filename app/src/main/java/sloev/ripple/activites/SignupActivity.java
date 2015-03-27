@@ -73,7 +73,7 @@ public class SignupActivity extends ActionBarActivity {
         dataholder.getDataHolder().setSignInUserPassword(qbUser.getPassword());
         System.out.println("signup success");
 
-        Intent intent = new Intent(this, MapActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 

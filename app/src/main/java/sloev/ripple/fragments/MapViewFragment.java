@@ -27,6 +27,8 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import sloev.ripple.R;
+import sloev.ripple.chat.ChatListener;
+import sloev.ripple.chat.MainActivityListener;
 import sloev.ripple.model.UserDataStructure;
 import sloev.ripple.util.ApplicationSingleton;
 import sloev.ripple.util.MapCamera;
@@ -40,8 +42,10 @@ import sloev.ripple.util.MapCamera;
  * create an instance of this fragment.
  * inspired by:
  * http://stackoverflow.com/questions/15098878/using-locationlistener-within-a-fragment
+ * og
+ * http://michalu.eu/wordpress/android-mapfragment-nested-in-parent-fragment/
  */
-public class MapViewFragment extends SupportMapFragment implements LocationListener {
+public class MapViewFragment extends SupportMapFragment implements LocationListener, ChatListener, MainActivityListener {
     private Handler handler = null;
     private UserDataStructure signedInUserData;
     private ApplicationSingleton dataholder;
@@ -95,6 +99,9 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
         dataholder = ApplicationSingleton.getDataHolder();
         camera = new MapCamera();
         signedInUserData = dataholder.getSignInUserData();
+
+        dataholder.getPrivateChatManager().initChatListener();
+        dataholder.getPrivateChatManager().addListener(this);
 
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
 // Showing status
@@ -182,11 +189,11 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     }
 
     public void locationsUpdate() {
+
         if (handler != null) {
             handler.post(locationsUpdatedRunnable);
         }
     }
-
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -201,5 +208,11 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    @Override
+    public void autofocusEnabled(boolean enabled) {
+        System.out.println("autofocus called in frag");
+        autofocusEnabled = enabled;
     }
 }

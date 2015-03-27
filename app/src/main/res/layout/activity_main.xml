@@ -19,6 +19,7 @@
         android:checked="true"
         android:onClick="focusEnable"
         android:textOff="focus off"
-        android:textOn="focus on " />
+        android:textOn="focus on "
+        android:width="100dp"/>
 
 </RelativeLayout>

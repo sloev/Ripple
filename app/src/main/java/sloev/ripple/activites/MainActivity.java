@@ -14,12 +14,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import sloev.ripple.R;
+import sloev.ripple.chat.ChatListener;
+import sloev.ripple.chat.MainActivityListener;
 import sloev.ripple.fragments.MapViewFragment;
 
 public class MainActivity extends FragmentActivity {
-    FragmentManager fragmentManager;
-    ToggleButton autofocusToggle;
+    private FragmentManager fragmentManager;
+    private ToggleButton autofocusToggle;
+    private List<MainActivityListener> listeners = new ArrayList<MainActivityListener>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +40,26 @@ public class MainActivity extends FragmentActivity {
         if (mapViewFragment == null) {
             FragmentTransaction ft = fragmentManager.beginTransaction();
             MapViewFragment frag = MapViewFragment.newInstance();
+            addListener(frag);
             ft.replace(R.id.map_container, frag, "map_view_fragment");
             ft.commit();
             fragmentManager.executePendingTransactions();
         }
     }
     public void focusEnable(View v){
-        ((MapViewFragment) fragmentManager.findFragmentByTag("map_view_fragment")).autofocusEnabled = autofocusToggle.isEnabled();
+        for ( MainActivityListener mainActivityListener : listeners){
+            mainActivityListener.autofocusEnabled(autofocusToggle.isEnabled());
+        }
     }
+
+    public void addListener(MainActivityListener toAdd) {
+        listeners.add(toAdd);
+    }
+
+    public void removeListener(MainActivityListener toAdd) {
+        listeners.remove(toAdd);
+    }
+
 }
 
 

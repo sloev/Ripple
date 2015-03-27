@@ -29,10 +29,6 @@
             android:name=".activites.SignupActivity"
             android:label="@string/title_activity_signup" >
         </activity>
-        <activity
-            android:name=".activites.MapActivity"
-            android:label="@string/title_activity_map" >
-        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
