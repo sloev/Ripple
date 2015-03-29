@@ -22,7 +22,7 @@ import sloev.ripple.chat.ChatListener;
 import sloev.ripple.chat.MainActivityListener;
 import sloev.ripple.fragments.MapViewFragment;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends ActionBarActivity {
     private FragmentManager fragmentManager;
     private ToggleButton autofocusToggle;
     private List<MainActivityListener> listeners = new ArrayList<MainActivityListener>();
