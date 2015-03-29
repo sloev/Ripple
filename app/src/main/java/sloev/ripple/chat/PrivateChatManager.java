@@ -150,7 +150,7 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
             UserDataStructure userData = dataholder.getUserData(userId);
 
             if (userData == null) {
-                userData = new UserDataStructure(userId, true);
+                userData = new UserDataStructure(userId, true, "z");
                 dataholder.addUserToContacts(userId, userData);
                 System.out.println("user added to contacts:");
             }

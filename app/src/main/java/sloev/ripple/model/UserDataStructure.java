@@ -30,11 +30,11 @@ public class UserDataStructure {
 
     private int iconId;
 
-    public UserDataStructure(int userId, boolean enabled){
+    public UserDataStructure(int userId, boolean enabled, String snippet){
         this.userId = userId;
         this.enabled = enabled;
         position = null;
-        snippet = "";
+        this.snippet=snippet;
         setSignInUser(false);
     }
     public UserDataStructure(String serializedSelf){
@@ -78,6 +78,9 @@ public class UserDataStructure {
 
     public boolean isEnabled() {
         return enabled;
+    }
+    public void setEnabled(boolean enabled){
+        this.enabled=enabled;
     }
     public String getSnippet(){
         return snippet;

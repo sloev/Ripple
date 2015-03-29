@@ -91,7 +91,7 @@ public class SigninActivity extends ActionBarActivity {
                 dataholder.setSignInUserPassword(passwordField.getText().toString());
                 int userId = qbUser.getId();
                 if (!dataholder.contactsContainsUser(userId)) {
-                    UserDataStructure userData = new UserDataStructure(userId, true);
+                    UserDataStructure userData = new UserDataStructure(userId, true, qbUser.getLogin());
                     userData.setSignInUser(true);
                     dataholder.addUserToContacts(userId, userData);
                     System.out.println("login user now in contacts:");
@@ -144,7 +144,7 @@ public class SigninActivity extends ActionBarActivity {
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(context, MainActivity.class);
+                Intent intent = new Intent(context, MainDrawerActivity.class);
                 startActivity(intent);
 
                 finish();

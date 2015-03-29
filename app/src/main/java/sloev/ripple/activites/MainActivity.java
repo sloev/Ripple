@@ -41,7 +41,7 @@ public class MainActivity extends ActionBarActivity {
             FragmentTransaction ft = fragmentManager.beginTransaction();
             MapViewFragment frag = MapViewFragment.newInstance();
             addListener(frag);
-            ft.replace(R.id.map_container, frag, "map_view_fragment");
+            ft.replace(R.id.map_container_old, frag, "map_view_fragment");
             ft.commit();
             fragmentManager.executePendingTransactions();
         }

@@ -34,7 +34,7 @@ public class ApplicationSingleton {
     private static ApplicationSingleton dataHolder;
 
     private Map<Integer, UserDataStructure> userContacts = new HashMap<Integer, UserDataStructure>();
-    private List<UserDataStructure> enabledContacts = new ArrayList<UserDataStructure>();
+    private List<Integer> indexToUserId = new ArrayList<Integer>();
     private QBUser signInQbUser;
 
 
@@ -91,6 +91,8 @@ public class ApplicationSingleton {
         return userContacts.values();
     }
 
+
+
     public boolean contactsContainsUser(int userId){
         return userContacts.containsKey(userId);
     }
@@ -104,9 +106,23 @@ public class ApplicationSingleton {
             return userContacts.get(userId);
         }
     }
+    public UserDataStructure getUserByIndex(int index){
+        return userContacts.get(indexToUserId.get(index));
+    }
 
     public void addUserToContacts(int userId, UserDataStructure userData) {
         userContacts.put(userId, userData);
+        if(!userData.isSignInUser()) {
+            indexToUserId.add(userId);
+        }
+    }
+    public List<Integer> getIndexList(){
+        return indexToUserId;
+    }
+
+    public void removeUserToContacts(int userId) {
+        userContacts.remove(userId);
+        indexToUserId.remove(userId);
     }
 
     public UserDataStructure getSignInUserData(){

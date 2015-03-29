@@ -32,7 +32,7 @@ public class SignupActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-        fingerprint = "johannesdf";
+        fingerprint = "cc";
         dataholder = ApplicationSingleton.getDataHolder();
         settings = getSharedPreferences(dataholder.PREFS_NAME, 0);
         passwordField = (EditText) findViewById(R.id.passwordField);
@@ -73,7 +73,7 @@ public class SignupActivity extends ActionBarActivity {
         dataholder.getDataHolder().setSignInUserPassword(qbUser.getPassword());
         System.out.println("signup success");
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainDrawerActivity.class);
         startActivity(intent);
     }
 

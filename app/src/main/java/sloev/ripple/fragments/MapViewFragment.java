@@ -27,6 +27,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import sloev.ripple.R;
+import sloev.ripple.activites.MainDrawerActivity;
 import sloev.ripple.chat.ChatListener;
 import sloev.ripple.chat.MainActivityListener;
 import sloev.ripple.model.UserDataStructure;
@@ -36,7 +37,6 @@ import sloev.ripple.util.MapCamera;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MapViewFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link MapViewFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -63,7 +63,7 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
                 if (googleMap != null) {
                     googleMap.clear();
                     for (UserDataStructure userData : dataholder.getContacts()) {
-                        if (userData.hasGpsFix()) {
+                       if (userData.hasGpsFix()) {
                             googleMap.addMarker(userData.getMarkerOptions());
                         }
                     }
@@ -112,18 +112,7 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
         }
 
 
-        initMap();
         return v;
-    }
-
-    private void initMap() {
-        /*
-        getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(mPosition, 15));
-
-        getMap().addMarker(new MarkerOptions().position(mPosition));
-        getMap().getUiSettings().setAllGesturesEnabled(true);
-        getMap().getUiSettings().setCompassEnabled(true);
-        */
     }
 
     private void focusCamera() {
@@ -163,18 +152,23 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     }
 
     private void initLocationManager() {
+        System.out.println("GPS INIT");
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         //LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
         Location location = locationManager.getLastKnownLocation(provider);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
+
         locationManager.requestLocationUpdates(provider, gpsRefreshRateMs, 0, this);//Constants.LOCATION_MIN_TIME, 0, this);
     }
 
 
     @Override
     public void onLocationChanged(Location location) {
+        System.out.println("GPS");
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         LatLng position = new LatLng(latitude, longitude);
@@ -189,6 +183,7 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     }
 
     public void locationsUpdate() {
+        System.out.println("locations update");
 
         if (handler != null) {
             handler.post(locationsUpdatedRunnable);

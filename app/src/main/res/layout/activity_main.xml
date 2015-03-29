@@ -7,13 +7,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:name="sloev.ripple.fragments.MapViewFragment"
-        android:id="@+id/map_container"
+        android:id="@+id/map_container_old"
         />
 
     <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/autofocusToggle"
+        android:id="@+id/autofocusToggle_old"
         android:layout_alignParentEnd="true"
         android:checked="true"
         android:onClick="focusEnable"

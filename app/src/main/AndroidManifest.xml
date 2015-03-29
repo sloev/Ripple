@@ -24,6 +24,7 @@
         <activity
             android:name=".activites.SigninActivity"
             android:label="@string/title_activity_signin" >
+
         </activity>
         <activity
             android:name=".activites.SignupActivity"
@@ -42,6 +43,11 @@
         <activity
             android:name=".activites.MainActivity"
             android:label="@string/title_activity_main" >
+        </activity>
+        <activity
+            android:name=".activites.MainDrawerActivity"
+            android:label="@string/title_activity_main_drawer" >
+
         </activity>
     </application>
 
