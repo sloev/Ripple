@@ -44,17 +44,20 @@ public class MainDrawerActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-
+    private ApplicationSingleton dataholder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ApplicationSingleton dataholder = ApplicationSingleton.getDataHolder();
+        dataholder = ApplicationSingleton.getDataHolder();
+/*
         dataholder.addUserToContacts(21, new UserDataStructure(21,true, "lol"));
         dataholder.addUserToContacts(32, new UserDataStructure(32,false, "sdf"));
         dataholder.addUserToContacts(44, new UserDataStructure(44,true, "rgegr"));
         dataholder.addUserToContacts(55, new UserDataStructure(55,true, "sfgasdgrt"));
 
+        dataholder.saveContacts(this);
+*/
         setContentView(R.layout.activity_main_drawer);
         autofocusToggle = (ToggleButton) findViewById(R.id.autofocusToggle);
 
@@ -78,6 +81,11 @@ public class MainDrawerActivity extends ActionBarActivity
             ft.commit();
             fragmentManager.executePendingTransactions();
         }
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dataholder.saveContacts(this);
     }
 
     @Override

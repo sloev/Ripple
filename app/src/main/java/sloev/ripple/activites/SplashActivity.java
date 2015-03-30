@@ -57,6 +57,7 @@ public class SplashActivity extends Activity {
         ApplicationSingleton.getDataHolder().setPrivateChatManager(privateChatManager);
         SharedPreferences settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
         boolean signedUp = settings.getBoolean("signedUp", false);
+        ApplicationSingleton.getDataHolder().loadContacts(this);
 
         Intent intent;
         //TODO: remove . kun i debug

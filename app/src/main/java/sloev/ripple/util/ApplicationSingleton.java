@@ -56,37 +56,64 @@ public class ApplicationSingleton {
         this.privateChatManager = privateChatManager;
     }
 
-    public void loadContactMap(Context context) throws JSONException, InvalidKeySpecException, NoSuchAlgorithmException {
-        SharedPreferences settings = context.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
-        //fp fat pp signed in user
-        String jsonString = settings.getString(SIGNED_IN_USER, "");
-        JSONObject jsonObject = new JSONObject(jsonString);
+    public void loadContacts(Context context)  {
+        try {
+
+            SharedPreferences settings = context.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
+            //fp fat pp signed in user
+            //String jsonString = settings.getString(SIGNED_IN_USER, "");
+            //JSONObject jsonObject = new JSONObject(jsonString);
 
 
-        //fp fat alle andre brugere
-        jsonString = settings.getString(USERS, "");
-        JSONArray jsonArray = new JSONArray(jsonString);
+            //fp fat alle andre brugere
+            String jsonString = settings.getString(USERS, "");
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray jsonArray = jsonObject.getJSONArray(USERS);
 
-        //JSONArray jsonArray = jsonData.getJSONArray(USERS);
-        int userId;
-        Boolean enabled;
-        for(int i=0; i<jsonArray.length(); i++) {
-            JSONObject json_data = jsonArray.getJSONObject(i);
-            userId = jsonObject.getInt("user_id");
-            enabled = json_data.getBoolean("enabled");
-            //map.put(fingerprint, new UserStructure(public_exponent, public_modulus, enabled));
+
+            //JSONArray jsonArray = jsonData.getJSONArray(USERS);
+            int userId;
+            Boolean enabled;
+            String snippet;
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject json_data = jsonArray.getJSONObject(i);
+                userId = json_data.getInt("user_id");
+                enabled = json_data.getBoolean("enabled");
+                snippet = json_data.getString("snippet");
+                UserDataStructure userDataStructure = new UserDataStructure(userId, enabled, snippet);
+                userContacts.put(userId, userDataStructure);
+                indexToUserId.add(userId);
+                //map.put(fingerprint, new UserStructure(public_exponent, public_modulus, enabled));
+            }
         }
-
-        //map.put("dog", "type of animal")
-        //a user is a fingerprint, big integer, modulus integer, enabled
-        //for all users from json:
-        //
-
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void saveContactMap(Context context){
-        //map.get("dog")
+    public void saveContacts(Context context) {
+        JSONArray userArray = new JSONArray();
+        String jsonString = "";
+        try {
+
+            for (UserDataStructure userDataStructure : getContacts()) {
+                JSONObject userObject = new JSONObject();
+                userObject.put("user_id", userDataStructure.getUserId());
+                userObject.put("enabled", userDataStructure.isEnabled());
+                userObject.put("snippet", userDataStructure.getSnippet());
+                userArray.put(userObject);
+            }
+
+            jsonString = new JSONObject().put(USERS,userArray).toString();
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+        SharedPreferences settings = context.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(USERS, jsonString);
+        editor.commit();
     }
+
     public Collection<UserDataStructure> getContacts(){
         return userContacts.values();
     }
