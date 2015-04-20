@@ -69,11 +69,11 @@ public class ContactListFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        int userId = Integer.parseInt(new_contact_name.getText().toString());
+        String snippet = new_contact_name.getText().toString();
+        int userId = Integer.parseInt(snippet);
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(new_contact_name.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         boolean enabled = false;
-        String snippet = "lolcat";
         UserDataStructure userdata = new UserDataStructure(userId, enabled, snippet);
         dataholder.addUserToContacts(userId, userdata);
         System.out.println("added contact");
