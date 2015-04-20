@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import sloev.ripple.R;
-import sloev.ripple.activites.MainDrawerActivity;
 import sloev.ripple.chat.ChatListener;
 import sloev.ripple.chat.MainActivityListener;
 import sloev.ripple.model.UserDataStructure;

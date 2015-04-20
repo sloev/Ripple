@@ -1,31 +1,32 @@
 package sloev.ripple.fragments;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 
 import sloev.ripple.R;
 import sloev.ripple.adaptors.ContactAdapter;
-import sloev.ripple.adaptors.ContactAdaptor;
+import sloev.ripple.model.UserDataStructure;
 import sloev.ripple.util.ApplicationSingleton;
 
 
-public class ContactListFragment extends Fragment {
-    ContactAdapter adaptor = null;
+public class ContactListFragment extends Fragment implements View.OnClickListener {
+    ApplicationSingleton dataholder = null;
+    ContactAdapter adapter = null;
     ListView listview = null;
+    EditText new_contact_name = null;
+    Button new_contact_button = null;
 
-    // TODO: Rename and change types and number of parameters
     public static ContactListFragment newInstance() {
         ContactListFragment fragment = new ContactListFragment();
-
         return fragment;
     }
 
@@ -36,47 +37,29 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        dataholder = ApplicationSingleton.getDataHolder();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v =  inflater.inflate(R.layout.fragment_contact_list, container, false);
-        listview = (ListView) v.findViewById(R.id.contact_list_view);
+        View v = inflater.inflate(R.layout.fragment_contact_list, container, false);
+            listview = (ListView) v.findViewById(R.id.contact_list_view);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                inflater.getContext(), android.R.layout.simple_list_item_1,
-                GetlistContact());
-        adaptor = new ContactAdapter(getActivity(), R.layout.contact_list_item);
+            adapter = new ContactAdapter(getActivity(), R.layout.contact_list_item);
+            listview.setAdapter(adapter);
 
-        listview.setAdapter(adaptor);
+            new_contact_name = (EditText) v.findViewById(R.id.new_contact_name);
+            new_contact_button = (Button)v.findViewById(R.id.new_contact_button);
+            new_contact_button.setOnClickListener(this);
+
         return v;
-    }
-    private ArrayList<String> GetlistContact(){
-        ArrayList<String> contactlist = new ArrayList<String>();
-        for (int i = 0;i<10;i++) {
-            contactlist.add(Integer.toString(i));
-        }
-
-        return contactlist;
-
-}
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        System.out.println(ApplicationSingleton.getDataHolder().getIndexList());
-
-
-
-
     }
 
     @Override
@@ -84,16 +67,16 @@ public class ContactListFragment extends Fragment {
         super.onDetach();
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-
-
+    @Override
+    public void onClick(View v) {
+        int userId = Integer.parseInt(new_contact_name.getText().toString());
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(new_contact_name.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        boolean enabled = false;
+        String snippet = "lolcat";
+        UserDataStructure userdata = new UserDataStructure(userId, enabled, snippet);
+        dataholder.addUserToContacts(userId, userdata);
+        System.out.println("added contact");
+        adapter.notifyDataSetChanged();
+    }
 }
