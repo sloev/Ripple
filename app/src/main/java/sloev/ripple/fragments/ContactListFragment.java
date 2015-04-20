@@ -1,80 +1,87 @@
 package sloev.ripple.fragments;
 
 import android.app.Activity;
-import android.app.ListFragment;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import sloev.ripple.R;
-
+import sloev.ripple.adaptors.ContactAdapter;
 import sloev.ripple.adaptors.ContactAdaptor;
-import sloev.ripple.fragments.dummy.DummyContent;
+import sloev.ripple.util.ApplicationSingleton;
 
 
-public class ContactListFragment extends Fragment implements AbsListView.OnItemClickListener {
-    private ContactAdaptor adaptor;
-    private ListView mDrawerListView;
+public class ContactListFragment extends Fragment {
+    ContactAdapter adaptor = null;
+    ListView listview = null;
 
-
-    // TODO: Rename and change types of parameters
+    // TODO: Rename and change types and number of parameters
     public static ContactListFragment newInstance() {
         ContactListFragment fragment = new ContactListFragment();
+
         return fragment;
     }
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public ContactListFragment() {
+        // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+        // Inflate the layout for this fragment
+        View v =  inflater.inflate(R.layout.fragment_contact_list, container, false);
+        listview = (ListView) v.findViewById(R.id.contact_list_view);
 
-        adaptor = new ContactAdaptor(getActivity());
-        mDrawerListView.setAdapter(adaptor);
-        return mDrawerListView;
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                inflater.getContext(), android.R.layout.simple_list_item_1,
+                GetlistContact());
+        adaptor = new ContactAdapter(getActivity(), R.layout.contact_list_item);
+
+        listview.setAdapter(adaptor);
+        return v;
     }
+    private ArrayList<String> GetlistContact(){
+        ArrayList<String> contactlist = new ArrayList<String>();
+        for (int i = 0;i<10;i++) {
+            contactlist.add(Integer.toString(i));
+        }
 
+        return contactlist;
+
+}
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+
+    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-       /* try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+
+        System.out.println(ApplicationSingleton.getDataHolder().getIndexList());
+
+
+
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
     }
 
     /**
@@ -87,10 +94,6 @@ public class ContactListFragment extends Fragment implements AbsListView.OnItemC
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
-    }
+
 
 }
-

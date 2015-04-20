@@ -2,5 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context="sloev.ripple.activites.MapActivity">
     <item android:id="@+id/action_contacts" android:title="@string/action_contacts"
-        android:orderInCategory="99" app:showAsAction="never" />
+        android:orderInCategory="10" app:showAsAction="never" />
+    <item android:id="@+id/action_delete_account" android:title="@string/action_delete_account"
+        android:orderInCategory="90" app:showAsAction="never" />
 </menu>

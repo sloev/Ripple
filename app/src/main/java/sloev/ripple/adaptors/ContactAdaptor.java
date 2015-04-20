@@ -24,7 +24,6 @@ import sloev.ripple.util.ApplicationSingleton;
 public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener {
     ApplicationSingleton dataholder;
     private int indexCount;
-    private int extraOptions = 2;
 
     public ContactAdaptor(Context context) {
         super(context, 0);
@@ -58,23 +57,21 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
     @Override
     public int getItemViewType(int position) {
         // Define a way to determine which layout to use, here it's just evens and odds.
-        if (position >= indexCount){
-            return 2;
-        }else{
+
             return 1;
-        }
     }
 
     @Override
     public int getViewTypeCount() {
-        return 2; // Count of different layouts
+        return 1; // Count of different layouts
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
+        System.out.println("inside adaptor");
+        UserDataStructure user =  dataholder.getUserByIndex(position);
 
-        UserDataStructure user = null;
 
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
@@ -82,7 +79,6 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
             viewHolder = new ViewHolder();
 
             //if (getItemViewType(position) == 1){
-                user = dataholder.getUserByIndex(position);
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.contact_list_item, parent, false);
 
                 CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.list_contact_checkbox);
@@ -105,10 +101,10 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
             viewHolder = (ViewHolder) convertView.getTag();
         }
         //if (getItemViewType(position) == 1) {
+    viewHolder.name.setText(user.getSnippet());
+    viewHolder.checkBox.setChecked(user.isEnabled());
+    viewHolder.checkBox.setTag(user);
 
-            viewHolder.name.setText(user.getSnippet());
-            viewHolder.checkBox.setChecked(user.isEnabled());
-            viewHolder.checkBox.setTag(user);
        /* }else{
             viewHolder.name.setText("lolcat");
             //viewHolder.checkBox.setEnabled(false);

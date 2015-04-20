@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
@@ -43,15 +45,29 @@ import sloev.ripple.util.DialogUtils;
 public class SingleActivity extends ActionBarActivity implements SignInFragment.SignInListener, SignUpFragment.SignUpListener{
     ApplicationSingleton dataholder;
     SharedPreferences settings;
+    private ProgressBar spinner;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single);
+        spinner = (ProgressBar)findViewById(R.id.progressBar1);
+        spinner.setVisibility(View.GONE);
+
         dataholder = ApplicationSingleton.getDataHolder();
+
+
+        dataholder.addUserToContacts(21, new UserDataStructure(21,true, "lol"));
+        dataholder.addUserToContacts(32, new UserDataStructure(32,false, "sdf"));
+        dataholder.addUserToContacts(44, new UserDataStructure(44,true, "rgegr"));
+        dataholder.addUserToContacts(55, new UserDataStructure(55,true, "sfgasdgrt"));
+
+        dataholder.saveContacts(this);
+
         settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
 
+        spinner.setVisibility(View.VISIBLE);
         Credentials.getDataHolder().QBAuthorize();
         QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
             @Override
@@ -92,6 +108,9 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
             change_fragment("contact_list_fragment");
             return true;
         }
+        if(id== R.id.action_delete_account){
+            delete_account();
+        }
         if (id == android.R.id.home) {
             System.out.println("home");
             if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
@@ -123,9 +142,12 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
     @Override
     public void sign_in(final String username, final String password) {
         QBUser qbUser = new QBUser(username, password);
+        spinner.setVisibility(View.VISIBLE);
+
         QBUsers.signIn(qbUser, new QBEntityCallbackImpl<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
+                spinner.setVisibility(View.GONE);
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(password);
                 instantiate_chat(qbUser);
@@ -134,6 +156,8 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
 
             @Override
             public void onError(List<String> errors) {
+                spinner.setVisibility(View.GONE);
+
                 System.out.println("sign in error");
                 DialogInterface.OnClickListener checkInPositiveButton;
                 DialogInterface.OnClickListener checkInNegativeButton;
@@ -145,6 +169,7 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
 
                 checkInNegativeButton = new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
+
                         // Canceled.
                     }
                 };
@@ -158,6 +183,8 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
     }
     public void sign_up(String username, final String password) {
         QBUser qbUser = new QBUser(username, password);
+        spinner.setVisibility(View.VISIBLE);
+
         QBUsers.signUpSignInTask(qbUser, new QBEntityCallbackImpl<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
@@ -174,6 +201,7 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
             @Override
             public void onError(List<String> errors) {
                 System.out.println("sign up error");
+                spinner.setVisibility(View.GONE);
                 DialogUtils.show(SingleActivity.this, getString(R.string.sign_up_refusal));
             }
         });
@@ -194,6 +222,8 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
                 try {
                     chatService.startAutoSendPresence(30);
                     dataholder.getPrivateChatManager().initChatListener(); // todo lig dette i initiate chat i single activity
+                    spinner.setVisibility(View.GONE);
+
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
                 }
@@ -204,6 +234,8 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
 
             @Override
             public void onError(List errors) {
+                spinner.setVisibility(View.GONE);
+
                 AlertDialog.Builder dialog = new AlertDialog.Builder(SingleActivity.this);
                 dialog.setMessage("chat login errors: " + errors).create().show();
             }
@@ -264,7 +296,10 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
             System.out.println("fragment is null");
         }
         fm.executePendingTransactions();
+        spinner.setVisibility(View.GONE);
+
         displayHomeIfNeeded();
+
     }
 
     @Override
@@ -280,6 +315,33 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }else{
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+    }
+
+    private void delete_account(){
+        spinner.setVisibility(View.VISIBLE);
+        QBUser user = ApplicationSingleton.getDataHolder().getSignInQbUser();
+        if (user != null) {
+            QBUsers.deleteUser(user.getId(), new QBEntityCallbackImpl() {
+                @Override
+                public void onSuccess() {
+                    System.out.println("deleted self");
+                    SharedPreferences settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.remove(getString(R.string.IS_SIGNED_IN));
+                    editor.commit();
+                    sign_up_or_in();
+                }
+
+                @Override
+                public void onError(List errors) {
+                    spinner.setVisibility(View.GONE);
+                    Toast.makeText(SingleActivity.this, getString(R.string.error_on_user_delete), Toast.LENGTH_SHORT).show();
+                    System.out.println(getString(R.string.error_on_user_delete));
+                }
+            });
+        } else {
+            Toast.makeText(SingleActivity.this, getString(R.string.error_on_user_delete), Toast.LENGTH_SHORT).show();
         }
     }
 }
