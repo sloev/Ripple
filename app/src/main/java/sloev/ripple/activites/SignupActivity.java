@@ -1,14 +1,16 @@
 package sloev.ripple.activites;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.users.QBUsers;
@@ -18,27 +20,27 @@ import java.util.List;
 
 import sloev.ripple.R;
 import sloev.ripple.util.ApplicationSingleton;
+import sloev.ripple.util.DialogUtils;
 
 
 public class SignupActivity extends ActionBarActivity {
     private SharedPreferences settings;
     private EditText passwordField;
-    private TextView fingerprintView;
-    private String fingerprint;
-
+    private EditText userName;
     private ApplicationSingleton dataholder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-        fingerprint = "cc";
         dataholder = ApplicationSingleton.getDataHolder();
         settings = getSharedPreferences(dataholder.PREFS_NAME, 0);
         passwordField = (EditText) findViewById(R.id.passwordField);
-        fingerprintView = (TextView) findViewById(R.id.fingerprintView);
-        fingerprintView.setText(fingerprint);
+        userName = (EditText) findViewById(R.id.userNameField);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(getString(R.string.SIGN_UP_TITEL));
     }
 
 
@@ -58,32 +60,34 @@ public class SignupActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
-    private void singupSuccess(QBUser qbUser){
+
+    private void singupSuccess(QBUser qbUser) {
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("signedUp", true);
-        editor.putString("loginFingerPrint", qbUser.getLogin());
+        editor.putBoolean(getString(R.string.IS_SIGNED_IN), true);
+        editor.putString(getString(R.string.SIGNED_IN_USER),qbUser.getLogin());
         // Commit the edits!
         editor.commit();
         dataholder.setSignInQbUser(qbUser);
         dataholder.getDataHolder().setSignInUserPassword(qbUser.getPassword());
         System.out.println("signup success");
 
-        Intent intent = new Intent(this, MainDrawerActivity.class);
+        Intent intent = new Intent(this, SigninActivity.class);
         startActivity(intent);
     }
 
-    private void signupFail(){
+    private void signupFail() {
         System.out.println("signup failz");
     }
 
-    public void signUp(View v){
+    public void signUp(View v) {
         QBUser qbUser = new QBUser();
-        qbUser.setLogin(fingerprint);
+        qbUser.setLogin(userName.getText().toString());
         qbUser.setPassword(passwordField.getText().toString());
         QBUsers.signUpSignInTask(qbUser, new QBEntityCallbackImpl<QBUser>() {
             @Override
@@ -91,10 +95,18 @@ public class SignupActivity extends ActionBarActivity {
                 singupSuccess(qbUser);
                 finish();
             }
-
+/*
             @Override
             public void onError(List<String> strings) {
                 signupFail();
+            }
+*/
+
+            @Override
+            public void onError(List<String> errors) {
+                System.out.println("sign up error");
+
+                DialogUtils.show(SignupActivity.this, getString(R.string.sign_up_refusal));
             }
         });
     }

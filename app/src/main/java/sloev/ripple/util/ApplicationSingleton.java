@@ -3,6 +3,7 @@ package sloev.ripple.util;
 
 import android.content.SharedPreferences;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.DropBoxManager;
 
 import com.quickblox.users.model.QBUser;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 import org.json.*;
 
+import sloev.ripple.R;
 import sloev.ripple.chat.PrivateChatManager;
 import sloev.ripple.model.UserDataStructure;
 /**
@@ -55,6 +57,7 @@ public class ApplicationSingleton {
     public void setPrivateChatManager(PrivateChatManager privateChatManager) {
         this.privateChatManager = privateChatManager;
     }
+
 
     public void loadContacts(Context context)  {
         try {
@@ -179,5 +182,18 @@ public class ApplicationSingleton {
         return signInQbUser.getLogin();
     }
 
+    public boolean DeleteAccount(Context context){
+            signInQbUser = null;
+            userContacts.clear();
+            indexToUserId.clear();
+            SharedPreferences settings = context.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            Resources res = context.getResources();
+            editor.remove(res.getString(R.string.IS_SIGNED_IN));
+            editor.remove(res.getString(R.string.SIGNED_IN_USER));
+            editor.commit();
+            return true;
+
+    }
 }
 

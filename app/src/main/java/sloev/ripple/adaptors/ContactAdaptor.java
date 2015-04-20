@@ -1,4 +1,4 @@
-package sloev.ripple.activites;
+package sloev.ripple.adaptors;
 
 
 import android.app.Activity;
@@ -43,10 +43,10 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
             CheckBox cb = (CheckBox) v;
             UserDataStructure user = (UserDataStructure) cb.getTag();
             user.setEnabled(cb.isChecked());
-       /* }else{
+        /*}else{
             System.out.println("LOL ITS ALIVE");
-        }
-        */
+        }*/
+
 
     }
 
@@ -54,7 +54,7 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
         TextView name;
         CheckBox checkBox;
     }
-    /*
+
     @Override
     public int getItemViewType(int position) {
         // Define a way to determine which layout to use, here it's just evens and odds.
@@ -69,7 +69,7 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
     public int getViewTypeCount() {
         return 2; // Count of different layouts
     }
-*/
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
@@ -94,7 +94,7 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
 
                 TextView name = (TextView) convertView.findViewById(R.id.list_contact_name);
                 viewHolder.name = name;
-           /* }else{
+            /*}else{
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.drawer_choice_item, parent, false);
                 TextView name = (TextView) convertView.findViewById(R.id.menu_option_name);
                 viewHolder.name = name;
@@ -113,7 +113,8 @@ public class ContactAdaptor extends ArrayAdapter implements View.OnClickListener
             viewHolder.name.setText("lolcat");
             //viewHolder.checkBox.setEnabled(false);
         }
-*/
+        */
+
         return convertView;
     }
 }

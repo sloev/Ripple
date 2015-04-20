@@ -17,16 +17,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import sloev.ripple.R;
-import sloev.ripple.model.UserDataStructure;
-import sloev.ripple.util.ApplicationSingleton;
+import sloev.ripple.adaptors.ContactAdaptor;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -103,12 +98,12 @@ private ContactAdaptor adaptor;
                              Bundle savedInstanceState) {
         mDrawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectItem(position);
             }
-        });
+        });*/
 
 
 
@@ -139,6 +134,8 @@ private ContactAdaptor adaptor;
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
+
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the navigation drawer and the action bar app icon.
@@ -197,13 +194,13 @@ private ContactAdaptor adaptor;
     }
 
     private void selectItem(int position) {
-        mCurrentSelectedPosition = position;
+        /*mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             checks[position] = !checks[position];
             for (int i = 0; i < checks.length; i++){
                 mDrawerListView.setItemChecked(i, checks[i]);
             }
-        }
+        }*/
         /*if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
@@ -215,11 +212,11 @@ private ContactAdaptor adaptor;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
+       /* try {
             mCallbacks = (NavigationDrawerCallbacks) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
-        }
+        }*/
     }
 
     @Override
@@ -258,8 +255,8 @@ private ContactAdaptor adaptor;
             return true;
         }
 
-        if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.drop_account) {
+            Toast.makeText(getActivity(), "drop account.", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -272,9 +269,8 @@ private ContactAdaptor adaptor;
      */
     private void showGlobalContextActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setTitle(R.string.app_name);
     }
 
     private ActionBar getActionBar() {

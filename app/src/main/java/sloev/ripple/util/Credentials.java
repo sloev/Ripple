@@ -6,9 +6,9 @@ import com.quickblox.core.QBSettings;
  * Created by johannes on 09/03/15.
  */
 public class Credentials {
-    private static final String QB_APP_ID = "666";
-    private static final String QB_AUTH_KEY = "lol";
-    private static final String QB_AUTH_SECRET = "cat";
+    private static final String QB_APP_ID = "20389";
+    private static final String QB_AUTH_KEY = "ZjmkuL356ZRN7M-";
+    private static final String QB_AUTH_SECRET = "caVnryyFwK-Y29V";
 
     private static Credentials dataHolder;
 

@@ -1,6 +1,7 @@
 package sloev.ripple.activites;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -32,6 +33,7 @@ import sloev.ripple.util.ApplicationSingleton;
 public class MainDrawerActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private ToggleButton autofocusToggle;
+    private MapViewFragment frag;
     private List<MainActivityListener> listeners = new ArrayList<MainActivityListener>();
 
 
@@ -43,7 +45,6 @@ public class MainDrawerActivity extends ActionBarActivity
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
-    private CharSequence mTitle;
     private ApplicationSingleton dataholder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,6 @@ public class MainDrawerActivity extends ActionBarActivity
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -75,7 +75,7 @@ public class MainDrawerActivity extends ActionBarActivity
 
         if (mapViewFragment == null) {
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            MapViewFragment frag = MapViewFragment.newInstance();
+            frag = MapViewFragment.newInstance();
             addListener(frag);
             ft.replace(R.id.map_container_new, frag, "map_view_fragment");
             ft.commit();
@@ -99,7 +99,7 @@ public class MainDrawerActivity extends ActionBarActivity
     }
 
     public void onSectionAttached(int number) {
-        switch (number) {
+     /*   switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
                 break;
@@ -110,13 +110,13 @@ public class MainDrawerActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_section3);
                 break;
         }
+        */
     }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
        // actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        actionBar.setDisplayShowTitleEnabled(false);
     }
 
 
@@ -142,6 +142,9 @@ public class MainDrawerActivity extends ActionBarActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            finish();
             return true;
         }
 

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -33,10 +34,10 @@ import sloev.ripple.util.DialogUtils;
 public class SigninActivity extends ActionBarActivity {
     private ApplicationSingleton dataholder;
     private EditText passwordField;
-    private EditText userName;
-    private TextView fingerprintView;
+    //private EditText userName;
+    private TextView userNameView;
     private SharedPreferences settings;
-    private String loginName;
+    private String username;
     private Context context;
     QBChatService chatService;
 
@@ -48,13 +49,16 @@ public class SigninActivity extends ActionBarActivity {
         SharedPreferences settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
 
         dataholder = ApplicationSingleton.getDataHolder();
-        //fingerprintView = (TextView) findViewById(R.id.fingerprintView);
-        loginName = "bot";//(String) settings.getString("loginFingerPrint", "");
-        //fingerprintView.setText(loginName);
+        username = settings.getString(getString(R.string.SIGNED_IN_USER), "");//(String) settings.getString("loginFingerPrint", "");
+        userNameView = (TextView) findViewById(R.id.userNameView);
+        userNameView.setText(username);
 
 
         passwordField = (EditText) findViewById(R.id.passwordField);
-        userName = (EditText) findViewById(R.id.userName);
+        //userName = (EditText) findViewById(R.id.userName);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(getString(R.string.SIGN_IN_TITEL));
 
     }
 
@@ -75,14 +79,15 @@ public class SigninActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     public void signIn(View v){
-        QBUser qbUser = new QBUser(userName.getText().toString(), passwordField.getText().toString());
+        QBUser qbUser = new QBUser(username, passwordField.getText().toString());
         QBUsers.signIn(qbUser, new QBEntityCallbackImpl<QBUser>() {
             @Override
             public void onSuccess(QBUser qbUser, Bundle bundle) {
@@ -98,7 +103,7 @@ public class SigninActivity extends ActionBarActivity {
                     System.out.println("login user now in contacts:");
                 }
                 signinSuccess();
-                //finish();
+                finish();
 
 
             }

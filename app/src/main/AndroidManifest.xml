@@ -15,16 +15,11 @@
         <activity
             android:name=".activites.SplashActivity"
             android:label="@string/title_activity_splash" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activites.SigninActivity"
             android:label="@string/title_activity_signin" >
-
         </activity>
         <activity
             android:name=".activites.SignupActivity"
@@ -41,13 +36,21 @@
         <uses-library android:name="com.google.android.maps" />
 
         <activity
-            android:name=".activites.MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
-        <activity
             android:name=".activites.MainDrawerActivity"
             android:label="@string/title_activity_main_drawer" >
+        </activity>
+        <activity
+            android:name=".activites.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name=".activites.SingleActivity"
+            android:label="@string/title_activity_single" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

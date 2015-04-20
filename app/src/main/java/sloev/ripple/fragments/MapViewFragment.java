@@ -2,29 +2,39 @@ package sloev.ripple.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import sloev.ripple.R;
 import sloev.ripple.activites.MainDrawerActivity;
@@ -44,14 +54,23 @@ import sloev.ripple.util.MapCamera;
  * http://stackoverflow.com/questions/15098878/using-locationlistener-within-a-fragment
  * og
  * http://michalu.eu/wordpress/android-mapfragment-nested-in-parent-fragment/
+ * og
+ * http://stackoverflow.com/questions/13728041/move-markers-in-google-map-v2-android
+ * og
+ * https://blog.codecentric.de/en/2014/05/android-gps-positioning-location-strategies/
  */
 public class MapViewFragment extends SupportMapFragment implements LocationListener, ChatListener, MainActivityListener {
-    private Handler handler = null;
-    private UserDataStructure signedInUserData;
-    private ApplicationSingleton dataholder;
+    public Handler handler = null;
+    private Criteria criteria;
+    private ApplicationSingleton dataholder = null;
+    private Location old_location = null;
+
     public boolean autofocusEnabled = true;
 
-    private int gpsRefreshRateMs = 15000;
+    private int gpsRefreshRateMs = 1500;
+    private long minDistance = 10; // Minimum distance change for update in meters, i.e. 10 meters.
+    static final int TIME_DIFFERENCE_THRESHOLD = 10000;
+
     private MapCamera camera;
 
 
@@ -63,23 +82,47 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
                 if (googleMap != null) {
                     googleMap.clear();
                     for (UserDataStructure userData : dataholder.getContacts()) {
-                       if (userData.hasGpsFix()) {
-                            googleMap.addMarker(userData.getMarkerOptions());
+                        if (userData.hasGpsFix()) {
+                            MarkerOptions marker_options = userData.getOldMarkerOptions();
+                            if (marker_options == null){
+                                marker_options = userData.getMarkerOptions();
+                            }
+                            Marker marker = googleMap.addMarker(marker_options);
                         }
                     }
-                    if (autofocusEnabled) {
-                        focusCamera();
+                    if(autofocusEnabled){
+                        googleMap.animateCamera(camera.zoomIn(),500, null);//default zoom=0.001
                     }
+                }
+
+                handler.postDelayed(this, 500);
+            }
+
+        }
+    };
+    private void update_markers(){
+        GoogleMap googleMap = getMap();
+        if (googleMap != null) {
+            googleMap.clear();
+            for (UserDataStructure userData : dataholder.getContacts()) {
+                if (userData.hasGpsFix()) {
+                    MarkerOptions marker_options = userData.getOldMarkerOptions();
+                    if (marker_options == null) {
+                        marker_options = userData.getMarkerOptions();
+                    }
+                    Marker marker = googleMap.addMarker(marker_options);
+                    marker.setVisible(true);
                 }
             }
         }
-    };
+    }
+
+
     Runnable sendGpsRunnable = new Runnable() {
 
         @Override
         public void run() {
             sendLocationToContacts();
-            handler.postDelayed(this, gpsRefreshRateMs);
         }
     };
 
@@ -96,39 +139,133 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle bundle) {
         View v = super.onCreateView(inflater, viewGroup, bundle);
-        dataholder = ApplicationSingleton.getDataHolder();
-        camera = new MapCamera();
-        signedInUserData = dataholder.getSignInUserData();
-
-        dataholder.getPrivateChatManager().initChatListener();
-        dataholder.getPrivateChatManager().addListener(this);
-
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
-// Showing status
-        if (status == ConnectionResult.SUCCESS) {
-            {
-                initLocationManager();
-            }
-        }
-
 
         return v;
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (dataholder == null) {
+            dataholder = ApplicationSingleton.getDataHolder();
+            dataholder.getPrivateChatManager().addListener(this);
+        }
+
+        if (camera == null) {
+            camera = new MapCamera();
+        }
+        try {
+
+            int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
+            if (status == ConnectionResult.SUCCESS) {
+                LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+                    /*if (get_old_location() == null) {
+                        String provider = LocationManager.NETWORK_PROVIDER;
+                        // Returns last known location, this is the fastest way to get a location fix.
+
+                        set_old_location(locationManager.getLastKnownLocation(provider));
+                    }*/
+
+                criteria = new Criteria();
+                criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
+                criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
+                criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
+                criteria.setAltitudeRequired(false); // Choose if you use altitude.
+                criteria.setBearingRequired(false); // Choose if you use bearing.
+                criteria.setCostAllowed(false); // Choose if this provider can waste money :-)
+
+                // Provide your criteria and flag enabledOnly that tells
+                // LocationManager only to return active providers.
+                locationManager.getBestProvider(criteria, true);
+                String provider = locationManager.getBestProvider(criteria, true);
+
+                do_gps_work(locationManager.getLastKnownLocation(provider));
+
+                locationManager.requestLocationUpdates(provider, gpsRefreshRateMs, 0, this);
+
+            }
+
+            /*
+            mListener = (SignUpListener) activity;
+            if (settings == null){
+                settings = activity.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
+            }*/
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    private void do_gps_work(Location location) {
+        System.out.println("DO_GPS_WORK");
+        if (location == null){
+            return;
+        }
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        LatLng position = new LatLng(latitude, longitude);
+
+        try {
+
+            UserDataStructure userData = dataholder.getSignInUserData();
+            userData.setPosition(position);
+            if (handler == null) {
+                handler = new Handler();
+                    handler.post(locationsUpdatedRunnable);
+
+                handler.postDelayed(sendGpsRunnable, 0); //TODO: change so transmission only occurs if there is any friends to transmit to
+            }
+            //locationsUpdate();
+        } catch (NullPointerException e) {
+            //LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            //locationManager.removeUpdates(this);
+            System.out.println("no user is logged in");
+        }
+
+        set_old_location(location);
+    }
+
+    private void set_old_location(Location location) {
+        old_location = location;
+    }
+
+    private Location get_old_location() {
+        return old_location;
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        System.out.println("detaching gps");
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        // Stop listening to location updates, also stops providers.
+        locationManager.removeUpdates(this);
+        /*
+        mListener = null;
+        */
+    }
+
     private void focusCamera() {
         if (handler != null) {
-            getMap().animateCamera(camera.zoomIn());//default zoom=0.001
+            getMap().animateCamera(camera.zoomIn(), 800, null);//default zoom=0.001
         } else {
             System.out.println("cant focus/zoom since lacking gps self");
         }
     }
 
     public void sendLocationToContacts() {
+        UserDataStructure signedInUserData = dataholder.getSignInUserData();
+
+        if (signedInUserData == null) {
+            return;
+        }
         if (!signedInUserData.hasGpsFix()) {
             return;
         }
         try {
-            LatLng myPosition = dataholder.getSignInUserData().getPosition();
+
+            LatLng myPosition = signedInUserData.getPosition();
 
 
             for (UserDataStructure userData : dataholder.getContacts()) {
@@ -148,46 +285,24 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
             e1.printStackTrace();
         } catch (SmackException.NotConnectedException e1) {
             e1.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
-    private void initLocationManager() {
-        System.out.println("GPS INIT");
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-        //LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String provider = locationManager.getBestProvider(criteria, true);
-        Location location = locationManager.getLastKnownLocation(provider);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
-
-        locationManager.requestLocationUpdates(provider, gpsRefreshRateMs, 0, this);//Constants.LOCATION_MIN_TIME, 0, this);
-    }
-
-
-    @Override
-    public void onLocationChanged(Location location) {
-        System.out.println("GPS");
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        LatLng position = new LatLng(latitude, longitude);
-
-        UserDataStructure userData = dataholder.getSignInUserData();
-        userData.setPosition(position);
-        if (handler == null) {
-            handler = new Handler();
-            handler.postDelayed(sendGpsRunnable, 0); //TODO: change so transmission only occurs if there is any friends to transmit to
-        }
-        locationsUpdate();
-    }
 
     public void locationsUpdate() {
         System.out.println("locations update");
-
+/*
         if (handler != null) {
             handler.post(locationsUpdatedRunnable);
         }
+        */
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        do_gps_work(location);
     }
 
     @Override

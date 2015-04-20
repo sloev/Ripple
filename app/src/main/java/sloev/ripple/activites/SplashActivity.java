@@ -56,20 +56,21 @@ public class SplashActivity extends Activity {
         PrivateChatManager privateChatManager = new PrivateChatManager(this);
         ApplicationSingleton.getDataHolder().setPrivateChatManager(privateChatManager);
         SharedPreferences settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
-        boolean signedUp = settings.getBoolean("signedUp", false);
+        boolean signedUp = settings.getBoolean(getString(R.string.IS_SIGNED_IN), false);
         ApplicationSingleton.getDataHolder().loadContacts(this);
 
         Intent intent;
         //TODO: remove . kun i debug
         intent = new Intent(this, SigninActivity.class);
-/*
+
         if (signedUp){
             intent = new Intent(this, SigninActivity.class);
             System.out.println("signed up allready");
         }else{
             intent = new Intent(this, SignupActivity.class);
-        }*/
+        }
         startActivity(intent);
+        //finish();
     }
 
 

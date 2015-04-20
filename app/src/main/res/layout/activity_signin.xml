@@ -6,7 +6,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Fingerprint"
+        android:text="Log in as"
         android:id="@+id/textView"
         android:textSize="30dp"
         android:layout_alignParentTop="true"
@@ -15,17 +15,17 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="20dp"
         android:typeface="normal" />
-
-    <EditText
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/userName"
-        android:layout_alignParentTop="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/userNameView"
+        android:textSize="20dp"
+        android:typeface="normal"
+        android:layout_below="@+id/textView"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="50dp"
-        android:text="lol" />
+        android:layout_alignParentStart="true" />
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -34,12 +34,10 @@
         android:text="Password"
         android:id="@+id/textView4"
         android:textSize="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp"
         android:typeface="normal"
-        android:layout_below="@+id/textView" />
+        android:layout_below="@+id/userNameView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -49,7 +47,7 @@
         android:id="@+id/passwordField"
         android:gravity="left"
         android:textSize="20dp"
-        android:text="secretpassword"
+        android:text=""
         android:layout_below="@+id/textView4"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -66,5 +64,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="20dp"
         android:onClick="signIn" />
+
+
 
 </RelativeLayout>

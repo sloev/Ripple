@@ -21,6 +21,7 @@ import sloev.ripple.R;
  */
 public class UserDataStructure {
     private LatLng position;
+    private LatLng old_position = null;
 
     private boolean enabled;
     private String snippet;
@@ -96,4 +97,15 @@ public class UserDataStructure {
        return new MarkerOptions().position(position).icon(
                 BitmapDescriptorFactory.fromResource(iconId)).title(Integer.toString(userId)).snippet(snippet);
     }
+    public MarkerOptions getOldMarkerOptions() {
+        MarkerOptions options = null;
+        if (old_position != null){
+             options = new MarkerOptions().position(old_position).icon(
+                    BitmapDescriptorFactory.fromResource(iconId)).title(Integer.toString(userId)).snippet(snippet);
+        }
+        this.old_position = this.position;
+        return options;
+    }
+
+
 }
