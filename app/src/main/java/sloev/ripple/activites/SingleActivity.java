@@ -33,6 +33,7 @@ import sloev.ripple.R;
 import sloev.ripple.chat.ChatListener;
 import sloev.ripple.chat.PrivateChatManager;
 import sloev.ripple.fragments.ContactListFragment;
+import sloev.ripple.fragments.MapFragment;
 import sloev.ripple.fragments.MapViewFragment;
 import sloev.ripple.fragments.SignInFragment;
 import sloev.ripple.fragments.SignUpFragment;
@@ -42,7 +43,7 @@ import sloev.ripple.util.Credentials;
 import sloev.ripple.util.DialogUtils;
 
 
-public class SingleActivity extends ActionBarActivity implements SignInFragment.SignInListener, SignUpFragment.SignUpListener{
+public class SingleActivity extends ActionBarActivity implements ContactListFragment.ContactListListener, SignInFragment.SignInListener, SignUpFragment.SignUpListener{
     ApplicationSingleton dataholder;
     SharedPreferences settings;
     private ProgressBar spinner;
@@ -56,15 +57,14 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
         spinner.setVisibility(View.GONE);
 
         dataholder = ApplicationSingleton.getDataHolder();
-
-
+/*
         dataholder.addUserToContacts(21, new UserDataStructure(21,true, "lol"));
         dataholder.addUserToContacts(32, new UserDataStructure(32,false, "sdf"));
         dataholder.addUserToContacts(44, new UserDataStructure(44,true, "rgegr"));
         dataholder.addUserToContacts(55, new UserDataStructure(55,true, "sfgasdgrt"));
 
         dataholder.saveContacts(this);
-
+*/
         settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
 
         spinner.setVisibility(View.VISIBLE);
@@ -150,8 +150,9 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
                 spinner.setVisibility(View.GONE);
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(password);
+                load_contacts();
                 instantiate_chat(qbUser);
-                change_fragment("map_view_fragment");
+                change_fragment("map_fragment");
             }
 
             @Override
@@ -195,7 +196,7 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(password);
                 instantiate_chat(qbUser);
-                change_fragment("map_view_fragment");
+                change_fragment("map_fragment");
             }
 
             @Override
@@ -250,10 +251,12 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
         System.out.println("change fragment");
         System.out.println(tag);
         switch (tag) {
-            case "map_view_fragment":
+            case "map_fragment":
                 frag = (Fragment) fm.findFragmentByTag(tag);
                 if (frag == null) {
-                    frag = MapViewFragment.newInstance();
+                    frag = MapFragment.newInstance();
+                    frag.setRetainInstance(true);
+
                     /*dataholder.getPrivateChatManager().initChatListener();
                     dataholder.getPrivateChatManager().addListener((ChatListener) frag);
                     */
@@ -330,6 +333,11 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
                     SharedPreferences.Editor editor = settings.edit();
                     editor.remove(getString(R.string.IS_SIGNED_IN));
                     editor.commit();
+                    /*Fragment fragment = getSupportFragmentManager().findFragmentByTag("map_view_fragment");
+                    if(fragment != null)
+                        System.out.println("deleting map fragment");
+                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                    */
                     sign_up_or_in();
                 }
 
@@ -343,5 +351,13 @@ public class SingleActivity extends ActionBarActivity implements SignInFragment.
         } else {
             Toast.makeText(SingleActivity.this, getString(R.string.error_on_user_delete), Toast.LENGTH_SHORT).show();
         }
+    }
+    public void load_contacts(){
+        dataholder.loadContacts(this);
+    }
+
+    @Override
+    public void save_contacts() {
+        dataholder.saveContacts(this);
     }
 }

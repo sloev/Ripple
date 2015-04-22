@@ -60,7 +60,7 @@ import sloev.ripple.util.MapCamera;
  * og
  * https://blog.codecentric.de/en/2014/05/android-gps-positioning-location-strategies/
  */
-public class MapViewFragment extends SupportMapFragment implements LocationListener, ChatListener, MainActivityListener {
+public class MapViewFragment extends SupportMapFragment implements LocationListener, ChatListener, MainActivityListener{
     public Handler handler = null;
     private Criteria criteria;
     private ApplicationSingleton dataholder = null;
@@ -79,22 +79,29 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
         @Override
         public void run() {
             {
-                GoogleMap googleMap = getMap();
-                if (googleMap != null) {
-                    googleMap.clear();
-                    for (UserDataStructure userData : dataholder.getContacts()) {
-                        if (userData.hasGpsFix()) {
-                            MarkerOptions marker_options = userData.getOldMarkerOptions();
-                            if (marker_options == null){
-                                marker_options = userData.getMarkerOptions();
+                    GoogleMap googleMap = getMap();
+                    if (googleMap != null) {
+                        googleMap.clear();
+                        for (UserDataStructure userData : dataholder.getContacts()) {
+                            if (userData.hasGpsFix()) {
+                                MarkerOptions marker_options = userData.getOldMarkerOptions();
+                                if (marker_options == null) {
+                                    marker_options = userData.getMarkerOptions();
+                                }
+                                Marker marker = googleMap.addMarker(marker_options);
                             }
-                            Marker marker = googleMap.addMarker(marker_options);
+                        }
+                        if (autofocusEnabled) {
+                            try {
+                                //googleMap.animateCamera(camera.zoomIn(), 500, null);//default zoom=0.001
+                            }catch(IllegalStateException e){
+                                System.out.println("error in camera");
+                                System.out.println(e.getStackTrace());
+                            }
                         }
                     }
-                    if(autofocusEnabled){
-                        googleMap.animateCamera(camera.zoomIn(),500, null);//default zoom=0.001
-                    }
-                }
+
+
 
                 handler.postDelayed(this, 500);
             }
@@ -161,6 +168,7 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        System.out.println("attaching map fragment");
         if (dataholder == null) {
             dataholder = ApplicationSingleton.getDataHolder();
             dataholder.getPrivateChatManager().addListener(this);
@@ -214,6 +222,7 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     private void do_gps_work(Location location) {
         System.out.println("DO_GPS_WORK");
         if (location == null){
+            System.out.println("location is null");
             return;
         }
         double latitude = location.getLatitude();
@@ -227,7 +236,7 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
             if (handler == null) {
                 handler = new Handler();
                     handler.post(locationsUpdatedRunnable);
-
+                System.out.println("send gps runnable");
                 handler.postDelayed(sendGpsRunnable, 0); //TODO: change so transmission only occurs if there is any friends to transmit to
             }
             //locationsUpdate();
@@ -256,6 +265,8 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         // Stop listening to location updates, also stops providers.
         locationManager.removeUpdates(this);
+        handler.removeCallbacksAndMessages(null);
+        handler = null;
         /*
         mListener = null;
         */
@@ -270,6 +281,7 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
     }
 
     public void sendLocationToContacts() {
+        System.out.println("sending locations");
         UserDataStructure signedInUserData = dataholder.getSignInUserData();
 
         if (signedInUserData == null) {
@@ -303,16 +315,14 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+        handler.postDelayed(sendGpsRunnable, gpsRefreshRateMs); //TODO: change so transmission only occurs if there is any friends to transmit to
+
     }
 
 
     public void locationsUpdate() {
         System.out.println("locations update");
-/*
-        if (handler != null) {
-            handler.post(locationsUpdatedRunnable);
-        }
-        */
+
     }
 
     @Override
