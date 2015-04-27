@@ -1,7 +1,12 @@
 package sloev.ripple.model;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.ui.IconGenerator;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quickblox.users.model.QBUser;
@@ -22,8 +27,23 @@ import sloev.ripple.R;
 public class UserDataStructure {
     private LatLng position;
     private LatLng old_position = null;
+    private IconGenerator iconGenerator = null;
 
+    public boolean isUpdated_with_info() {
+        return updated_with_info;
+    }
+
+    public void setUpdated_with_info(boolean updated_with_info) {
+        this.updated_with_info = updated_with_info;
+    }
+
+    private boolean updated_with_info = false;
     private boolean enabled;
+
+    public void setSnippet(String snippet) {
+        this.snippet = snippet;
+    }
+
     private String snippet;
     private boolean isSignInUser;
     private int userId;
@@ -47,6 +67,7 @@ public class UserDataStructure {
         String serializedSelf = Boolean.toString(enabled) + " ";
         return serializedSelf;
     }
+
 
     public boolean isSignInUser(){
         return isSignInUser;
@@ -93,18 +114,19 @@ public class UserDataStructure {
         this.enabled = false;
     }
 
-    public MarkerOptions getMarkerOptions() {
-       return new MarkerOptions().position(position).icon(
-                BitmapDescriptorFactory.fromResource(iconId)).title(Integer.toString(userId)).snippet(snippet);
-    }
-    public MarkerOptions getOldMarkerOptions() {
-        MarkerOptions options = null;
-        if (old_position != null){
-             options = new MarkerOptions().position(old_position).icon(
-                    BitmapDescriptorFactory.fromResource(iconId)).title(Integer.toString(userId)).snippet(snippet);
+    public MarkerOptions getMarkerOptions(Context context) {
+        if (iconGenerator == null) {
+            iconGenerator = new IconGenerator(context);
         }
-        this.old_position = this.position;
-        return options;
+        if(isSignInUser) {
+            iconGenerator.setColor(Color.RED);
+        }else{
+            iconGenerator.setColor(Color.GREEN);
+        }
+        Bitmap icon = iconGenerator.makeIcon(snippet);
+
+        return new MarkerOptions().position(position).icon(
+                BitmapDescriptorFactory.fromBitmap(icon)).title(Integer.toString(userId)).snippet(snippet);
     }
 
 

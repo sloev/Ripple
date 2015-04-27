@@ -3,6 +3,7 @@ package sloev.ripple.chat;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -17,6 +18,7 @@ import com.quickblox.chat.listeners.QBMessageListenerImpl;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -137,10 +139,12 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
     @Override
     public void processMessage(QBPrivateChat chat, QBChatMessage message) {
         //gets user id
-        int userId = chat.getParticipant();
+        final int userId = chat.getParticipant();
         if (userId == dataholder.getSignInUserId()) {
             System.err.println("received message from self, ignoring");
         } else {
+            System.out.println("received message from:");
+            System.out.println(userId);
             //compute position
             String[] positionStr = message.getBody().split(" ");
             double lat = Double.parseDouble(positionStr[0]);
@@ -154,13 +158,13 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
                 dataholder.addUserToContacts(userId, userData);
                 System.out.println("user added to contacts:");
             }
+            if (!userData.isUpdated_with_info()){
+                for (ChatListener hl : listeners) {
+                    hl.update_user_data(userId);
+                }
+            }
             userData.setPosition(position);
 
-            // Notify everybody that may be interested.
-            for (ChatListener hl : listeners) {
-                hl.locationsUpdate();
-               // hl.gpsReceived(userId, position);
-            }
         }
     }
     /*

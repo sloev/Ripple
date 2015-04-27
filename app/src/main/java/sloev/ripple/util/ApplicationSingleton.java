@@ -78,11 +78,13 @@ public class ApplicationSingleton {
             int userId;
             Boolean enabled;
             String snippet;
+            boolean is_signin;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject json_data = jsonArray.getJSONObject(i);
                 userId = json_data.getInt("user_id");
                 enabled = json_data.getBoolean("enabled");
                 snippet = json_data.getString("snippet");
+                is_signin = json_data.getBoolean("is_sign_in");
                 UserDataStructure userDataStructure = new UserDataStructure(userId, enabled, snippet);
                 userContacts.put(userId, userDataStructure);
                 indexToUserId.add(userId);
@@ -104,6 +106,8 @@ public class ApplicationSingleton {
                 userObject.put("user_id", userDataStructure.getUserId());
                 userObject.put("enabled", userDataStructure.isEnabled());
                 userObject.put("snippet", userDataStructure.getSnippet());
+                userObject.put("is_sign_in", userDataStructure.isSignInUser());
+
                 userArray.put(userObject);
             }
 

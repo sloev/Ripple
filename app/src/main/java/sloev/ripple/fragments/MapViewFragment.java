@@ -60,7 +60,7 @@ import sloev.ripple.util.MapCamera;
  * og
  * https://blog.codecentric.de/en/2014/05/android-gps-positioning-location-strategies/
  */
-public class MapViewFragment extends SupportMapFragment implements LocationListener, ChatListener, MainActivityListener{
+public class MapViewFragment extends SupportMapFragment implements LocationListener, MainActivityListener{
     public Handler handler = null;
     private Criteria criteria;
     private ApplicationSingleton dataholder = null;
@@ -84,10 +84,8 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
                         googleMap.clear();
                         for (UserDataStructure userData : dataholder.getContacts()) {
                             if (userData.hasGpsFix()) {
-                                MarkerOptions marker_options = userData.getOldMarkerOptions();
-                                if (marker_options == null) {
-                                    marker_options = userData.getMarkerOptions();
-                                }
+                                MarkerOptions marker_options = userData.getMarkerOptions(getActivity());
+
                                 Marker marker = googleMap.addMarker(marker_options);
                             }
                         }
@@ -114,10 +112,8 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
             googleMap.clear();
             for (UserDataStructure userData : dataholder.getContacts()) {
                 if (userData.hasGpsFix()) {
-                    MarkerOptions marker_options = userData.getOldMarkerOptions();
-                    if (marker_options == null) {
-                        marker_options = userData.getMarkerOptions();
-                    }
+                    MarkerOptions marker_options = userData.getMarkerOptions(getActivity());
+
                     Marker marker = googleMap.addMarker(marker_options);
                     marker.setVisible(true);
                 }
@@ -171,7 +167,6 @@ public class MapViewFragment extends SupportMapFragment implements LocationListe
         System.out.println("attaching map fragment");
         if (dataholder == null) {
             dataholder = ApplicationSingleton.getDataHolder();
-            dataholder.getPrivateChatManager().addListener(this);
         }
 
         if (camera == null) {

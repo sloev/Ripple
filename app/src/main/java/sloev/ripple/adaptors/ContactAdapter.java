@@ -59,15 +59,19 @@ public class ContactAdapter extends ArrayAdapter implements View.OnClickListener
 
         holder.txtTitle.setText(user.getSnippet());
         holder.checkBox.setChecked(user.isEnabled());
-        holder.checkBox.setTag(user);
+        holder.checkBox.setTag(position);
         return row;
     }
 
     @Override
     public void onClick(View v) {
+        System.out.println("contact click");
         CheckBox cb = (CheckBox) v;
-        UserDataStructure user = (UserDataStructure) cb.getTag();
-        user.setEnabled(cb.isChecked());
+        Integer position = (Integer) cb.getTag();
+        UserDataStructure user =  dataholder.getUserByIndex(position);
+        boolean checked = cb.isChecked();
+        System.out.println(checked);
+        user.setEnabled(checked);
     }
 
     static class ViewHolder

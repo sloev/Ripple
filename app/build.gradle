@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -19,6 +20,13 @@ android {
     }
 }
 
+
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     //compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
@@ -30,4 +38,7 @@ dependencies {
     compile files('libs/spongycastle-core-1.51.0.0.jar')
     compile files('libs/spongycastle-pg-1.51.0.0.jar')
     compile files('libs/spongycastle-prov-1.51.0.0.jar')
+    compile 'com.google.maps.android:android-maps-utils:0.3+'
+
+
 }

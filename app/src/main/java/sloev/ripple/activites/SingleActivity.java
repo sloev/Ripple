@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -43,10 +44,12 @@ import sloev.ripple.util.Credentials;
 import sloev.ripple.util.DialogUtils;
 
 
-public class SingleActivity extends ActionBarActivity implements ContactListFragment.ContactListListener, SignInFragment.SignInListener, SignUpFragment.SignUpListener{
+public class SingleActivity extends ActionBarActivity implements ChatListener, ContactListFragment.ContactListListener, SignInFragment.SignInListener, SignUpFragment.SignUpListener{
     ApplicationSingleton dataholder;
     SharedPreferences settings;
     private ProgressBar spinner;
+
+    Handler handler = null;
 
 
     @Override
@@ -57,6 +60,7 @@ public class SingleActivity extends ActionBarActivity implements ContactListFrag
         spinner.setVisibility(View.GONE);
 
         dataholder = ApplicationSingleton.getDataHolder();
+        handler = new Handler();
 /*
         dataholder.addUserToContacts(21, new UserDataStructure(21,true, "lol"));
         dataholder.addUserToContacts(32, new UserDataStructure(32,false, "sdf"));
@@ -127,6 +131,7 @@ public class SingleActivity extends ActionBarActivity implements ContactListFrag
     private void sign_up_or_in() {
         if (dataholder.getPrivateChatManager() == null) {
             PrivateChatManager privateChatManager = new PrivateChatManager(this);
+            privateChatManager.addListener(this);
             dataholder.setPrivateChatManager(privateChatManager);
         }
         SharedPreferences settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
@@ -150,9 +155,10 @@ public class SingleActivity extends ActionBarActivity implements ContactListFrag
                 spinner.setVisibility(View.GONE);
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(password);
-                load_contacts();
+                System.out.println("signed in userid");
+                System.out.println(qbUser.getId());
                 instantiate_chat(qbUser);
-                change_fragment("map_fragment");
+                setTitle(Integer.toString(qbUser.getId()));
             }
 
             @Override
@@ -196,7 +202,6 @@ public class SingleActivity extends ActionBarActivity implements ContactListFrag
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(password);
                 instantiate_chat(qbUser);
-                change_fragment("map_fragment");
             }
 
             @Override
@@ -215,15 +220,21 @@ public class SingleActivity extends ActionBarActivity implements ContactListFrag
             userData.setSignInUser(true);
             dataholder.addUserToContacts(userId, userData);
             System.out.println("login user now in contacts:");
+        }else{
+            UserDataStructure userData = dataholder.getUserData(userId);
+            userData.setSignInUser(true);
         }
         final QBChatService chatService = dataholder.getPrivateChatManager().getChatService();
         chatService.login(qbUser, new QBEntityCallbackImpl() {
             @Override
             public void onSuccess() {
                 try {
-                    chatService.startAutoSendPresence(30);
                     dataholder.getPrivateChatManager().initChatListener(); // todo lig dette i initiate chat i single activity
+                    chatService.startAutoSendPresence(30);
                     spinner.setVisibility(View.GONE);
+                    load_contacts();
+                    change_fragment("map_fragment");
+
 
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
@@ -359,5 +370,31 @@ public class SingleActivity extends ActionBarActivity implements ContactListFrag
     @Override
     public void save_contacts() {
         dataholder.saveContacts(this);
+    }
+
+    @Override
+    public void update_user_data(final int userId) {
+        final UserDataStructure user_data = dataholder.getUserData(userId);
+        user_data.setUpdated_with_info(true);
+        Runnable update_user_info = new Runnable() {
+            @Override
+            public void run() {
+                {
+                    QBUsers.getUser(userId, new QBEntityCallbackImpl<QBUser>() {
+                        @Override
+                        public void onSuccess(QBUser user, Bundle args) {
+                            user_data.setSnippet(user.getLogin());
+                        }
+
+                        @Override
+                        public void onError(List<String> errors) {
+                            user_data.setUpdated_with_info(false);
+                        }
+                    });
+                }
+            }
+        };
+        handler.postDelayed(update_user_info, 0);
+
     }
 }
