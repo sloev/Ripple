@@ -39,8 +39,6 @@ public class ApplicationSingleton {
     private List<Integer> indexToUserId = new ArrayList<Integer>();
     private QBUser signInQbUser;
 
-
-
     private PrivateChatManager privateChatManager;
 
     public static synchronized ApplicationSingleton getDataHolder() {
@@ -60,6 +58,7 @@ public class ApplicationSingleton {
 
 
     public void loadContacts(Context context)  {
+        deleteAllContacts();
         try {
 
             SharedPreferences settings = context.getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
@@ -102,13 +101,14 @@ public class ApplicationSingleton {
         try {
 
             for (UserDataStructure userDataStructure : getContacts()) {
-                JSONObject userObject = new JSONObject();
-                userObject.put("user_id", userDataStructure.getUserId());
-                userObject.put("enabled", userDataStructure.isEnabled());
-                userObject.put("snippet", userDataStructure.getSnippet());
-                userObject.put("is_sign_in", userDataStructure.isSignInUser());
+                    JSONObject userObject = new JSONObject();
+                    userObject.put("user_id", userDataStructure.getUserId());
+                    userObject.put("enabled", userDataStructure.isEnabled());
+                    userObject.put("snippet", userDataStructure.getSnippet());
+                    userObject.put("is_sign_in", userDataStructure.isSignInUser());
 
-                userArray.put(userObject);
+                    userArray.put(userObject);
+
             }
 
             jsonString = new JSONObject().put(USERS,userArray).toString();
@@ -155,9 +155,12 @@ public class ApplicationSingleton {
     }
 
     public void removeUserToContacts(int userId) {
-        userContacts.remove(userId);
         indexToUserId.remove(userId);
+        userContacts.remove(userId);
     }
+    public void deleteAllContacts(){
+        userContacts = new HashMap<Integer, UserDataStructure>();
+        indexToUserId = new ArrayList<Integer>();    }
 
     public UserDataStructure getSignInUserData(){
         return userContacts.get(signInQbUser.getId());

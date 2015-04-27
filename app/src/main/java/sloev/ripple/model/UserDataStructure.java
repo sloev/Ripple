@@ -40,6 +40,8 @@ public class UserDataStructure {
     private boolean updated_with_info = false;
     private boolean enabled;
 
+    private int time_to_live = 1;
+
     public void setSnippet(String snippet) {
         this.snippet = snippet;
     }
@@ -74,10 +76,8 @@ public class UserDataStructure {
     }
     public void setSignInUser(boolean isSignInUser){
         this.isSignInUser = isSignInUser;
-        if ( isSignInUser){
-            iconId = R.drawable.map_marker_my;
-        }else{
-            iconId = R.drawable.map_marker_other;
+        if ( isSignInUser) {
+            time_to_live = 6;
         }
     }
 
@@ -97,6 +97,7 @@ public class UserDataStructure {
     public int getUserId() {
         return userId;
     }
+
 
     public boolean isEnabled() {
         return enabled;
@@ -118,16 +119,30 @@ public class UserDataStructure {
         if (iconGenerator == null) {
             iconGenerator = new IconGenerator(context);
         }
-        if(isSignInUser) {
+        if (isSignInUser) {
             iconGenerator.setColor(Color.RED);
         }else{
-            iconGenerator.setColor(Color.GREEN);
+            if (time_to_live > 3) {
+                iconGenerator.setColor(Color.GREEN);
+            }else{
+                iconGenerator.setColor(Color.YELLOW);
+            }
+            time_to_live--;
         }
         Bitmap icon = iconGenerator.makeIcon(snippet);
-
         return new MarkerOptions().position(position).icon(
                 BitmapDescriptorFactory.fromBitmap(icon)).title(Integer.toString(userId)).snippet(snippet);
     }
+
+    public void extend_life(){
+        time_to_live = 6;
+    }
+    public boolean is_alive(){
+        return time_to_live > 0;
+    }
+
+
+
 
 
 }

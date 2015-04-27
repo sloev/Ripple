@@ -43,6 +43,10 @@ import sloev.ripple.util.ApplicationSingleton;
 import sloev.ripple.util.Credentials;
 import sloev.ripple.util.DialogUtils;
 
+/*
+implement otr based on:
+https://code.google.com/p/otr4j/wiki/QuickStart
+ */
 
 public class SingleActivity extends ActionBarActivity implements ChatListener, ContactListFragment.ContactListListener, SignInFragment.SignInListener, SignUpFragment.SignUpListener{
     ApplicationSingleton dataholder;
@@ -61,14 +65,7 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
 
         dataholder = ApplicationSingleton.getDataHolder();
         handler = new Handler();
-/*
-        dataholder.addUserToContacts(21, new UserDataStructure(21,true, "lol"));
-        dataholder.addUserToContacts(32, new UserDataStructure(32,false, "sdf"));
-        dataholder.addUserToContacts(44, new UserDataStructure(44,true, "rgegr"));
-        dataholder.addUserToContacts(55, new UserDataStructure(55,true, "sfgasdgrt"));
 
-        dataholder.saveContacts(this);
-*/
         settings = getSharedPreferences(ApplicationSingleton.PREFS_NAME, 0);
 
         spinner.setVisibility(View.VISIBLE);
@@ -100,9 +97,6 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        System.out.println("button");
-        System.out.println(item);
-        System.out.println(id);
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
@@ -155,10 +149,9 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
                 spinner.setVisibility(View.GONE);
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(password);
-                System.out.println("signed in userid");
-                System.out.println(qbUser.getId());
                 instantiate_chat(qbUser);
-                setTitle(Integer.toString(qbUser.getId()));
+                String s = String.format("%s: %d",qbUser.getLogin(), qbUser.getId());
+                setTitle(s);
             }
 
             @Override
@@ -214,6 +207,7 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
     }
 
     private void instantiate_chat(QBUser qbUser) {
+        load_contacts();
         int userId = qbUser.getId();
         if (!dataholder.contactsContainsUser(userId)) {
             UserDataStructure userData = new UserDataStructure(userId, true, qbUser.getLogin());
@@ -232,7 +226,6 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
                     dataholder.getPrivateChatManager().initChatListener(); // todo lig dette i initiate chat i single activity
                     chatService.startAutoSendPresence(30);
                     spinner.setVisibility(View.GONE);
-                    load_contacts();
                     change_fragment("map_fragment");
 
 

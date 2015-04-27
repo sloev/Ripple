@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import sloev.ripple.R;
+import sloev.ripple.fragments.ContactListFragment;
 import sloev.ripple.model.UserDataStructure;
 import sloev.ripple.util.ApplicationSingleton;
 

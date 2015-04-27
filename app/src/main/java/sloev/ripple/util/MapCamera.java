@@ -36,14 +36,14 @@ public class MapCamera {
             return null;
         } else {
 
-            int padding = 100; // offset from edges of the map in pixels
+            int padding = 200; // offset from edges of the map in pixels
 
             //based on http://stackoverflow.com/questions/15700808/setting-max-zoom-level-in-google-maps-android-api-v2
             builder = new LatLngBounds.Builder();
             builder.include(signInUserData.getPosition());
 
             for (UserDataStructure userData : dataholder.getContacts()) {
-                if (userData.isEnabled() & userData.hasGpsFix()) {
+                if (userData.isEnabled() & userData.hasGpsFix() & userData.is_alive()) {
                     builder.include(userData.getPosition());
                 }
             }

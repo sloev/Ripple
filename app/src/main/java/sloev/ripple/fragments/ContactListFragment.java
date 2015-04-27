@@ -24,6 +24,7 @@ public class ContactListFragment extends Fragment implements View.OnClickListene
     ListView listview = null;
     EditText new_contact_name = null;
     Button new_contact_button = null;
+    Button delete_contact_button = null;
 
     private ContactListListener listener = null;
 
@@ -56,7 +57,8 @@ public class ContactListFragment extends Fragment implements View.OnClickListene
         new_contact_name = (EditText) v.findViewById(R.id.new_contact_name);
         new_contact_button = (Button) v.findViewById(R.id.new_contact_button);
         new_contact_button.setOnClickListener(this);
-
+        delete_contact_button = (Button) v.findViewById(R.id.delete_contact_button);
+        delete_contact_button.setOnClickListener(this);
         return v;
     }
 
@@ -74,15 +76,29 @@ public class ContactListFragment extends Fragment implements View.OnClickListene
         @Override
         public void onDetach () {
             super.onDetach();
+            listener.save_contacts();
             listener = null;
+
         }
 
         @Override
-        public void onClick (View v){
+        public void onClick (View v) {
             String snippet = new_contact_name.getText().toString();
             int userId = Integer.parseInt(snippet);
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(new_contact_name.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+            switch(v.getId()) {
+                case R.id.new_contact_button:
+                    add_contact(userId, snippet);
+                    break;
+                case R.id.delete_contact_button:
+                    delete_contact(userId, snippet);
+                    break;
+            }
+        }
+    public void add_contact(int userId, String snippet){
+
             boolean enabled = false;
             UserDataStructure userdata = new UserDataStructure(userId, enabled, snippet);
             dataholder.addUserToContacts(userId, userdata);
@@ -93,9 +109,17 @@ public class ContactListFragment extends Fragment implements View.OnClickListene
             adapter.notifyDataSetChanged();
 
         }
+    public void delete_contact(int userId, String snippet){
+        dataholder.removeUserToContacts(userId);
+        if(listener!=null){
+            listener.save_contacts();
+        }
+        System.out.println( "delete user");
+    }
         public interface ContactListListener {
             public void save_contacts();
         }
     }
+
 
 

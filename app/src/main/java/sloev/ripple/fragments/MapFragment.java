@@ -48,7 +48,7 @@ public class MapFragment extends Fragment implements LocationListener, GoogleMap
 
     private MapCamera camera;
 
-    private int gpsRefreshRateMs = 1500;
+    private int gpsRefreshRateMs = 2000;
 
 
     MapView mapView;
@@ -59,7 +59,7 @@ public class MapFragment extends Fragment implements LocationListener, GoogleMap
         public void run() {
             {
                 UpdateAndSendLocaitons();
-                handler.postDelayed(this, 500);
+                handler.postDelayed(this, gpsRefreshRateMs);
             }
         }
     };
@@ -195,39 +195,40 @@ public class MapFragment extends Fragment implements LocationListener, GoogleMap
 
         for (UserDataStructure userData : dataholder.getContacts()) {
             int userId = userData.getUserId();
+            if (userData.isEnabled()) {
+                LatLng position = userData.getPosition();
+                if (!userData.isSignInUser()) {
+                    System.out.println(String.format("sending to user:%d", userId));
+                    try {
+                        dataholder.getPrivateChatManager().newChat(userId);
+                        dataholder.getPrivateChatManager().sendLatLng(userId, myPosition);
+                        System.out.println("message send");
+                    } catch (XMPPException e2) {
+                        e2.printStackTrace();
+                    } catch (SmackException.NotConnectedException e2) {
+                        e2.printStackTrace();
+                    } catch (NullPointerException e3) {
+                        e3.printStackTrace();
+                    }
+                } else {
+                    System.out.println("not sending to self user");
+                }
+                if (userData.hasGpsFix() && userData.is_alive()) {
 
-            LatLng position = userData.getPosition();
-            System.out.println(String.format("sending to user:%d", userId));
-            try {
-                dataholder.getPrivateChatManager().newChat(userId);
-                dataholder.getPrivateChatManager().sendLatLng(userId, myPosition);
-                System.out.println("message send");
-            } catch (XMPPException e2) {
-                e2.printStackTrace();
-            } catch (SmackException.NotConnectedException e2) {
-                e2.printStackTrace();
-            } catch (NullPointerException e3) {
-                e3.printStackTrace();
-            }
-            if (!userData.isSignInUser()) {
-            } else {
-                System.out.println("not sending to self user");
-            }
-            if (userData.hasGpsFix()) {
-
-                if (map != null) {
+                    if (map != null) {
                     /*MarkerOptions marker_options = userData.getOldMarkerOptions();
                     if (marker_options == null) {
                     }*/
-                    MarkerOptions marker_options = userData.getMarkerOptions(getActivity());
+                        MarkerOptions marker_options = userData.getMarkerOptions(getActivity());
 
-                    Marker marker = map.addMarker(marker_options);
+                        Marker marker = map.addMarker(marker_options);
+                    }
                 }
             }
         }
         if (autofocusEnabled) {
             try {
-                map.animateCamera(camera.zoomIn(), 500, null);//default zoom=0.001
+                map.animateCamera(camera.zoomIn(), gpsRefreshRateMs, null);//default zoom=0.001
             } catch (IllegalStateException e) {
                 System.out.println("error in camera");
                 System.out.println(e.getStackTrace());

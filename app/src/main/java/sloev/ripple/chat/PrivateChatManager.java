@@ -143,6 +143,7 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
         if (userId == dataholder.getSignInUserId()) {
             System.err.println("received message from self, ignoring");
         } else {
+
             System.out.println("received message from:");
             System.out.println(userId);
             //compute position
@@ -152,18 +153,17 @@ public class PrivateChatManager extends QBMessageListenerImpl<QBPrivateChat> imp
             LatLng position = new LatLng(lat, lon);
 
             UserDataStructure userData = dataholder.getUserData(userId);
-
-            if (userData == null) {
-                userData = new UserDataStructure(userId, true, "z");
-                dataholder.addUserToContacts(userId, userData);
-                System.out.println("user added to contacts:");
-            }
-            if (!userData.isUpdated_with_info()){
-                for (ChatListener hl : listeners) {
-                    hl.update_user_data(userId);
+            try {
+                userData.extend_life();
+                if (!userData.isUpdated_with_info()) {
+                    for (ChatListener hl : listeners) {
+                        hl.update_user_data(userId);
+                    }
                 }
+                userData.setPosition(position);
+            }catch(NullPointerException e){
+                e.printStackTrace();
             }
-            userData.setPosition(position);
 
         }
     }
