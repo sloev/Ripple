@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Ripple $ documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '$',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Ripple $ documentation" href="index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="design.html" />
+    <link rel="prev" title="Welcome to Ripple’s documentation!" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="design.html" title="&lt;no title&gt;"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Ripple’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Ripple $ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="project-start">
+<h2>Project start<a class="headerlink" href="#project-start" title="Permalink to this headline">¶</a></h2>
+<p>This report documents the creation of an app for personal location sharing. I have often found
+myself in situations where i needed the knowledge of realtime update locations of other individuals.
+The cases could be a festival where i would be setting of scene stages. Often in that situation it is
+needed to know the location of a supervisor so you can evaluate if you can reach him within minutes or tens of minutes.
+Normally this would be done by sending text messages but i wanted something automatic you can just turn
+on and it will ping my location to my friends vice versa.</p>
+<p>Ripple is an app that seeks to fulfill exactly this feature, by transmitting my location and showing my location
+and friends locations on a map.</p>
+</div>
+<div class="section" id="problem-formulation">
+<h2>Problem formulation<a class="headerlink" href="#problem-formulation" title="Permalink to this headline">¶</a></h2>
+<p>I want to create an app that lets people share their locations on a fixed frequency.
+Ripple has to be structured as a container activity with different fragments occupying the container view.
+Ripple will use the XMPP protocol for transmission of locations and it will use the Quickblox as a BAAS and xmpp server.
+Ripple will focus on decoupled identities in such a way that your Ripple logins are disposable and decoupled from
+your established personal accounts like Facebook etc. This will reduce the chance of being compromised as
+you can easily dump your account and create a new one.
+Ripple will seek to be secure by letting you decide which contacts you want to transmit to and a stretch
+goal is to implement Off-The-Record encryption on all xmpp traffic.
+Ripple shall plot all locations of enabled contacts on a map and all markers will be colored according to the
+time since their last location ping. If an enabled contact doesnt transmit pings for a certain period it will
+automatically be removed from the map for less cluttering.</p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R1</td>
+<td>Use quickblox BAAS sdk for XMPP and user account managing</td>
+</tr>
+<tr class="row-odd"><td>R2</td>
+<td>Use a container activity and fragments</td>
+</tr>
+<tr class="row-even"><td>R3</td>
+<td>Option to dispose account and create new account</td>
+</tr>
+<tr class="row-odd"><td>R4</td>
+<td>Add contacts to contact list and enable/disable transmission to them</td>
+</tr>
+<tr class="row-even"><td>R5</td>
+<td>Create the option to automatically zoom in and show all enabled contacts on
+map</td>
+</tr>
+<tr class="row-odd"><td>R6</td>
+<td>Show all contacts on a map, if a contact does not ping its location within the
+allowed time frame it will be removed from the map. Within the time frame a
+color change will represent the freshness of its location ping.</td>
+</tr>
+<tr class="row-even"><td>R7</td>
+<td>Enable end to end encryption using Off-The-Record encryption</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#project-start">Project start</a></li>
+<li><a class="reference internal" href="#problem-formulation">Problem formulation</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Ripple&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="design.html"
+                        title="next chapter">&lt;no title&gt;</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/introduction.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, johannes jørgensen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/introduction.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

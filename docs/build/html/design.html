@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Design &mdash; Ripple $ documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '$',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Ripple $ documentation" href="index.html" />
+    <link rel="next" title="Implementation" href="implementation.html" />
+    <link rel="prev" title="Theory" href="theory.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="implementation.html" title="Implementation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Theory"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Ripple $ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="design">
+<h1>Design<a class="headerlink" href="#design" title="Permalink to this headline">¶</a></h1>
+<p>Ripple consist of variations of four view:</p>
+<ul class="simple">
+<li>Sign up</li>
+<li>Sign in</li>
+<li>Map</li>
+<li>Contacts list</li>
+</ul>
+<p>Underneath you see the different views and a few variations on the <em>Map</em> view.</p>
+<a class="reference internal image-reference" href="_images/screen_shots.png"><img alt="_images/screen_shots.png" src="_images/screen_shots.png" style="width: 90%;" /></a>
+<p>At first i was experimenting with auto generated usernames to further obfuscate them as disposable and
+give people the impression that they were <em>&#8220;non-personal&#8221;</em> but it was hard to implement the functionality of figuring
+out which usernames were not taken at the BAAS so i went with people typing in usernames when signing up <em>(see Figure A)</em></p>
+<div class="section" id="markers">
+<h2>Markers<a class="headerlink" href="#markers" title="Permalink to this headline">¶</a></h2>
+<p>Letting people customize their usernames also gave me the option to use these to personalize the map markers.
+I decided to set the title of the container activity to a combination of username and user_id so it is easier
+when you are adding contacts (you just look at their screen and type in their user_id and press add)</p>
+<p>The map markers change color as a function of the time-since-last-ping.
+In figure E and F you can see the functionality of the color change.
+We see in figure E that user <em>&#8220;hvad&#8221;</em> has added and enabled the user <em>&#8220;johannes&#8221;</em>. Johannes is green because <em>&#8220;hvad&#8221;</em> has just
+received a location update from <em>&#8220;johannes&#8221;</em>.</p>
+<p>In figure F we see that <em>&#8220;johannes&#8221;</em> has stopped sending location updates to <em>&#8220;hvad&#8221;</em>, this has changed the color
+of the <em>&#8220;johannes&#8221;</em> marker into yellow, the step between <em>&#8220;healthy&#8221;</em> and <em>&#8220;removed from map</em>&#8221;.</p>
+</div>
+<div class="section" id="contacts">
+<h2>Contacts<a class="headerlink" href="#contacts" title="Permalink to this headline">¶</a></h2>
+<p>Figure D shows the contacts view. This view is accessed from the action bar menu shown figure D.
+The contacts view lets you add a new contact, presently by typing in the user id of the contact.
+The view also lets you manage which contacts are enabled.</p>
+<p>The contact list describes which users you accept location updates from, like a whitelist.
+It also features a toggle switch to enable the contact.</p>
+<p>Enabling a contact means that you add the contact to the subset of contacts you transmit your location to.</p>
+<p>The figure beneath describes the relationships:</p>
+<a class="reference internal image-reference" href="_images/set_subset.png"><img alt="_images/set_subset.png" src="_images/set_subset.png" style="width: 70%;" /></a>
+<dl class="docutils">
+<dt>1 <span class="classifier-delimiter">:</span> <span class="classifier">accepted incomming updates:</span></dt>
+<dd>I accept, and draw markers for, incomming location updates from all contacts.</dd>
+<dt>2 <span class="classifier-delimiter">:</span> <span class="classifier">rejected incomming updates:</span></dt>
+<dd>I reject and ignore incomming location updates from users not in contact sub-set.</dd>
+<dt>3: bidirectional acceptance:</dt>
+<dd>The same as <em>1</em> with the added functionality that i actively transmit my location
+to users in this sub-sub-set at a fixed frequency.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Design</a><ul>
+<li><a class="reference internal" href="#markers">Markers</a></li>
+<li><a class="reference internal" href="#contacts">Contacts</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="previous chapter">Theory</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="implementation.html"
+                        title="next chapter">Implementation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/design.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, johannes jørgensen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/design.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

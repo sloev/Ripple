@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Process &mdash; Ripple $ documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '$',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Ripple $ documentation" href="index.html" />
+    <link rel="next" title="Theory" href="theory.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="theory.html" title="Theory"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Ripple $ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="process">
+<h1>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h1>
+<p>I decided early on that i would make an app for location sharing.</p>
+<p>I had been working with the version control system GIT before and decided to use it for this project.</p>
+<p>I started by defining which subjects i would need to research in order to find the optimal solution before
+starting to implement them.</p>
+<p>My main concerns from the start was:</p>
+<ul class="simple">
+<li>How to easily get XMPP up and running, best scenario would be without running the server myself</li>
+<li>Do i need a BAAS?</li>
+<li>How do i make the application secure?</li>
+<li>Should i put most weight on activities or fragments?</li>
+</ul>
+<div class="section" id="xmpp-and-baas">
+<h2>XMPP and BAAS<a class="headerlink" href="#xmpp-and-baas" title="Permalink to this headline">¶</a></h2>
+<p>I started by researching which solutions existed for messaging between users.
+Originally i wanted my application to establish further security by having a dectralized protocol for
+communications.</p>
+<p>However i soon figured out that decentralized communication is <em>bleeding edge</em> and in general not widely implemented.
+I dwelled at the extremely interesting <em>&#8220;Tele-Hash&#8221;</em> protocol by Jeremy Miller and wondered if i could
+make my own java implementation within the time fram but decided it was unrealistic.
+There is a short description of the Telehash protocol in the appendices.</p>
+<p>If it shouldn&#8217;t be a decentral protocol then the next best thing would be XMPP also originally invented by Jeremy Miller in the late 90&#8217;s.</p>
+<p>To create a XMPP system you need client implementations and a server.
+I tried to use the most recently updated XMPP libs for android i could find called <em>&#8220;Smack&#8221;</em>.
+I setup an xmpp server on my home server and tried to connect to it. After 2 days of tries and debugging i still had not
+established a connection.</p>
+<p>When searching for a solution to one fo the endless non-descript XMPP exceptions from the smack driver i came across
+a reference to the Quickblox BAAS.</p>
+<p>Quickblox used xmpp within but exposed a more simple xmpp api to the programmer.</p>
+<p>I decided it was the way to go and a bonus was that they acted as the xmpp server as well so i didn&#8217;t have to run it myself.</p>
+</div>
+<div class="section" id="secutity-and-authentication">
+<h2>Secutity and authentication<a class="headerlink" href="#secutity-and-authentication" title="Permalink to this headline">¶</a></h2>
+<p>When i had decided on the quickblox sdk i started looking for ways to implement security in the application.
+Security is critical since people are sharing their location and if a phone is compromised i wante to reduce the likelihood of
+the exposure of all the locations of said phones contacts.</p>
+<p>I had some ideas to implement security:</p>
+<p><strong>Make accounts disposable and decoupled</strong>
+The idea is to let accounts in my system be as naked as possible and decouple them from peoples private
+information, like facebook, phone, email etc.
+In this way you obfuscate the user so that the context is implicit.
+What i mean is that if a phone is stolen and an unwanted entity gains access to the map view.
+This entity will only be able to see where a number of usernames are located and nothing more.
+So only if the thief/government has knowledge of the context of a user then the information gains value.</p>
+<p><strong>End to end encryption of all messages</strong>
+Early on a wanted the messages to furthermore be protected by encryption from end to end.
+Different options exist for this and they all have their specialities.
+I already knew about the PGP assymetric encryption but it would break my idea of disposable accounts since pgp is
+public/private key encryption and therefore a key pair would have to be generated and stored on each account creation.
+This of course is no problem programmatically but if a solution existed to to end-to-end encryption without the keypairs i
+would prefer this.</p>
+<p>The solution seemed to be Off-The-Record encryption which was invented specifically for instant messaging.
+The OTR protocol uses a combination of many <em>&#8220;crypto&#8221;</em> tricks to generate secure encryption per session and per message.</p>
+<p>In this way i could make sure a message was not intercepted by a man-in-the-middle attack and the location of a user
+could be exposed.</p>
+<p>Sadly i came to this conclusion too late into the process and didn&#8217;t have time to implement the OTR protocol.
+However i managed to do the needed research and figure out which OTR library would have been suitable.</p>
+</div>
+<div class="section" id="activities-and-fragments">
+<h2>Activities and fragments<a class="headerlink" href="#activities-and-fragments" title="Permalink to this headline">¶</a></h2>
+<p>Through the process i had implemented my app with a focus on activities since they were the first you learned
+to implement following the lessons.
+As i followed the Android lessons i was acquainted with the concept of fragments and how their lifecycle is dramatically
+alternative compared to the activity.</p>
+<p>I rewrote the whole program to use fragments and decided to use a Singleton for storing information between fragments.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Process</a><ul>
+<li><a class="reference internal" href="#xmpp-and-baas">XMPP and BAAS</a></li>
+<li><a class="reference internal" href="#secutity-and-authentication">Secutity and authentication</a></li>
+<li><a class="reference internal" href="#activities-and-fragments">Activities and fragments</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="introduction.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="next chapter">Theory</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/process.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, johannes jørgensen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/process.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

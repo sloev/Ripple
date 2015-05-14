@@ -60,6 +60,7 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single);
+        setTitle("");
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
         spinner.setVisibility(View.GONE);
 
@@ -132,8 +133,10 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
         boolean signed_up = settings.getBoolean(getString(R.string.IS_SIGNED_IN), false);
 
         if (signed_up) {
+            setTitle("sign in");
             change_fragment("sign_in_fragment");
         } else {
+            setTitle("sign up");
             change_fragment("sign_up_fragment");
         }
     }
@@ -194,7 +197,8 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
                 editor.commit();
                 dataholder.setSignInQbUser(qbUser);
                 dataholder.setSignInUserPassword(password);
-                instantiate_chat(qbUser);
+                sign_up_or_in();
+                //instantiate_chat(qbUser);
             }
 
             @Override
@@ -259,7 +263,7 @@ public class SingleActivity extends ActionBarActivity implements ChatListener, C
                 frag = (Fragment) fm.findFragmentByTag(tag);
                 if (frag == null) {
                     frag = MapFragment.newInstance();
-                    frag.setRetainInstance(true);
+                    //frag.setRetainInstance(true);
 
                     /*dataholder.getPrivateChatManager().initChatListener();
                     dataholder.getPrivateChatManager().addListener((ChatListener) frag);
