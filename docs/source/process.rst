@@ -1,9 +1,27 @@
 Process
 =======
 
+Overview
+--------
+
 I decided early on that i would make an app for location sharing.
 
 I had been working with the version control system GIT before and decided to use it for this project.
+
+.. image::
+   images/commits.png
+   :width: 90%
+
+The figure above describes the amount of daily commits.
+
+.. image::
+   images/additions_deletions.png
+   :width: 90%
+
+The figure above shows the amount of daily additions/deletions, *(green/red)*, of lines.
+Around start of april is a slow down of productivity, this is around the same period where i started researching
+how to change the whole app from a focus on activities and on to fragments. It is also the same time where i had
+to write a lot of deliverables to other classes i am attending.
 
 I started by defining which subjects i would need to research in order to find the optimal solution before
 starting to implement them.
