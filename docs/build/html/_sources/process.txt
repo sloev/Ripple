@@ -8,17 +8,18 @@ I decided early on that i would make an app for location sharing.
 
 I had been working with the version control system GIT before and decided to use it for this project.
 
-.. image::
+.. figure::
    images/commits.png
-   :width: 90%
+   :figwidth: 90%
 
-The figure above describes the amount of daily commits.
+   The figure above describes the amount of daily commits.
 
-.. image::
+.. figure::
    images/additions_deletions.png
-   :width: 90%
+   :figwidth: 90%
 
-The figure above shows the amount of daily additions/deletions, *(green/red)*, of lines.
+   The figure above shows the amount of daily additions/deletions, *(green/red)*, of lines.
+
 Around start of april is a slow down of productivity, this is around the same period where i started researching
 how to change the whole app from a focus on activities and on to fragments. It is also the same time where i had
 to write a lot of deliverables to other classes i am attending.
@@ -44,6 +45,14 @@ However i soon figured out that decentralized communication is *bleeding edge* a
 I dwelled at the extremely interesting *"Tele-Hash"* protocol by Jeremy Miller and wondered if i could
 make my own java implementation within the time fram but decided it was unrealistic.
 There is a short description of the Telehash protocol in the appendices.
+
+.. figure::
+   images/xmpp_protocol.png
+   :figwidth: 100%
+   :scale: 200%
+
+   The xmpp protocol: client to server, server to server
+   [#xmpp_protocol]_
 
 If it shouldn't be a decentral protocol then the next best thing would be XMPP also originally invented by Jeremy Miller in the late 90's.
 
@@ -102,3 +111,8 @@ As i followed the Android lessons i was acquainted with the concept of fragments
 alternative compared to the activity.
 
 I rewrote the whole program to use fragments and decided to use a Singleton for storing information between fragments.
+
+
+.. rubric:: Footnotes
+   
+.. [#xmpp_protocol] http://www.isode.com/whitepapers/xmpp.html

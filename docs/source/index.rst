@@ -12,16 +12,6 @@
    theory
    design
    implementation
+   test.rst
    conclusion
    bibliography
-   appendices
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

@@ -59,11 +59,15 @@
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>I decided early on that i would make an app for location sharing.</p>
 <p>I had been working with the version control system GIT before and decided to use it for this project.</p>
-<a class="reference internal image-reference" href="_images/commits.png"><img alt="_images/commits.png" src="_images/commits.png" style="width: 90%;" /></a>
-<p>The figure above describes the amount of daily commits.</p>
-<a class="reference internal image-reference" href="_images/additions_deletions.png"><img alt="_images/additions_deletions.png" src="_images/additions_deletions.png" style="width: 90%;" /></a>
-<p>The figure above shows the amount of daily additions/deletions, <em>(green/red)</em>, of lines.
-Around start of april is a slow down of productivity, this is around the same period where i started researching
+<div class="figure" id="id2" style="width: 90%">
+<img alt="_images/commits.png" src="_images/commits.png" />
+<p class="caption"><span class="caption-text">The figure above describes the amount of daily commits.</span></p>
+</div>
+<div class="figure" id="id3" style="width: 90%">
+<img alt="_images/additions_deletions.png" src="_images/additions_deletions.png" />
+<p class="caption"><span class="caption-text">The figure above shows the amount of daily additions/deletions, <em>(green/red)</em>, of lines.</span></p>
+</div>
+<p>Around start of april is a slow down of productivity, this is around the same period where i started researching
 how to change the whole app from a focus on activities and on to fragments. It is also the same time where i had
 to write a lot of deliverables to other classes i am attending.</p>
 <p>I started by defining which subjects i would need to research in order to find the optimal solution before
@@ -85,6 +89,11 @@ communications.</p>
 I dwelled at the extremely interesting <em>&#8220;Tele-Hash&#8221;</em> protocol by Jeremy Miller and wondered if i could
 make my own java implementation within the time fram but decided it was unrealistic.
 There is a short description of the Telehash protocol in the appendices.</p>
+<div class="figure" id="id4" style="width: 100%">
+<a class="reference internal image-reference" href="_images/xmpp_protocol.png"><img alt="_images/xmpp_protocol.png" src="_images/xmpp_protocol.png" style="width: 998.0px; height: 414.0px;" /></a>
+<p class="caption"><span class="caption-text">The xmpp protocol: client to server, server to server
+<a class="footnote-reference" href="#xmpp-protocol" id="id1">[1]</a></span></p>
+</div>
 <p>If it shouldn&#8217;t be a decentral protocol then the next best thing would be XMPP also originally invented by Jeremy Miller in the late 90&#8217;s.</p>
 <p>To create a XMPP system you need client implementations and a server.
 I tried to use the most recently updated XMPP libs for android i could find called <em>&#8220;Smack&#8221;</em>.
@@ -129,6 +138,13 @@ to implement following the lessons.
 As i followed the Android lessons i was acquainted with the concept of fragments and how their lifecycle is dramatically
 alternative compared to the activity.</p>
 <p>I rewrote the whole program to use fragments and decided to use a Singleton for storing information between fragments.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="xmpp-protocol" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://www.isode.com/whitepapers/xmpp.html">http://www.isode.com/whitepapers/xmpp.html</a></td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
