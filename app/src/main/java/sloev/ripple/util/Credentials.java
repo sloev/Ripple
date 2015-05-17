@@ -10,7 +10,7 @@ public class Credentials {
     private static final String QB_AUTH_KEY = "ZjmkuL356ZRN7M-";
     private static final String QB_AUTH_SECRET = "caVnryyFwK-Y29V";
 
-    private static Credentials dataHolder;
+    private zstatic Credentials dataHolder;
 
     public static synchronized Credentials getDataHolder() {
         if (dataHolder == null) {
