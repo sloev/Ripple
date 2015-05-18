@@ -8,15 +8,15 @@ Ripple consist of variations of four view:
 * Map
 * Contacts list
 
-Underneath you see the different views and a few variations on the *Map* view.
+Underneath You see the different views and a few variations on the *Map* view.
 
 .. image::
    images/screen_shots.png
    :width: 90%
 
-At first i was experimenting with auto generated usernames to further obfuscate them as disposable and
+At first I was experimenting with auto generated usernames to further obfuscate them as disposable and
 give people the impression that they were *"non-personal"* but it was hard to implement the functionality of figuring
-out which usernames were not taken at the BAAS so i went with people typing in usernames when signing up *(see Figure A)*
+out which usernames were not taken at the BaaS so I went with people typing in usernames when signing up *(see Figure A)*
 
 Markers
 -------
@@ -53,12 +53,12 @@ The figure beneath describes the relationships:
    :width: 70%
 
 
-1 : accepted incomming updates:
-    I accept, and draw markers for, incomming location updates from all contacts.
-2 : rejected incomming updates:
-    I reject and ignore incomming location updates from users not in contact sub-set.
+1 : accepted incoming updates:
+    I accept, and draw markers for, incoming location updates from all contacts.
+2 : rejected incoming updates:
+    I reject and ignore incoming location updates from users not in contact sub-set.
 3: bidirectional acceptance:
-    The same as *1* with the added functionality that i actively transmit my location
+    The same as *1* with the added functionality that I actively transmit my location
     to users in this sub-sub-set at a fixed frequency.
 
 
