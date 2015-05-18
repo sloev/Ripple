@@ -43,7 +43,7 @@ Requirements
 +-------+------------------------------------------------------------------------------+
 |R4     |Add contacts to contact list and enable/disable transmission to them          |
 +-------+------------------------------------------------------------------------------+
-|R5     |Create the option to automatically zoom in and show all enabled contacts on   |
+|R5     |Automatically zoom in and show all enabled contacts on   |
 |       |map                                                                           |
 +-------+------------------------------------------------------------------------------+
 |R6     |Show all contacts on a map, if a contact does not ping its location within the|
@@ -52,5 +52,11 @@ Requirements
 +-------+------------------------------------------------------------------------------+
 |R7     |Enable end to end encryption using Off-The-Record encryption                  |
 +-------+------------------------------------------------------------------------------+
-|R8     |delete contacts															   |
+|R8     |Delete contacts															   |
 +-------+------------------------------------------------------------------------------+
+|R9	    |Brug lister og adaptere, netværkskommunikation, SharedPreferences             |
++-------+------------------------------------------------------------------------------+
+
+
+Lister og adaptere, Application-objekt, sensorer, netværkskomminikation, baggrundstråde f.eks. med AsyncTask, SharedPreferences, broadcast recievers, services, fragmenter
+
