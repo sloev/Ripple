@@ -1,39 +1,40 @@
 Theory
 ======
 
-Quickblox is a powerful BAAS with sdk's for many different platforms with a focus on providing easy
-communication, including both push notifications and chat messaging, and easy user account management.
-Quickblox is a commercial BAAS with a free edition maxing out at 20 messages/second and 200000 monthly users.
-This makes it ideal for a student project.
+Quickblox is a powerful BaaS with SDK's for many different platforms focusing on providing easy
+communication such as push notifications, chat messaging, and easy user account management.
+Quickblox is a commercial BaaS with a free edition maxing out at 20 messages/second and 200000 monthly users.
+These features make it a good choice for a student project.
 
-Quickblox creates a nice streamlined sdk for android that hides away a lot of the complexity of the underlying
+Quickblox creates a nice streamlined for android that hides away a lot of the complexity of the underlying
 libraries.
 
-An example is that quickblox uses xmpp for its chat protocol and uses the *smack* android xmpp library but
-quickblox adds a level of abstraction by hiding all *smack* functions and leaving a cleaner more high level api
+An example is that Quickblox uses XMPP for its chat protocol and uses the *smack* Android XMPP library but
+Quickblox adds a level of abstraction by hiding all *smack* functions and leaving a cleaner, more high level API
 for chat messaging.
 
-In this section i will try to explain the quickblox sdk centering around the User and Chat parts. I will cover
-implementation with examples and a guide on how to install the library.
+In this section i will try to explain the Quickblox SDK concerning the User and Chat parts. I will provide
+an implementation skeleton and a guide on how to install the library.
 
-The android sdk for quickblox in genereal presents you with a callback based asynchronous pack a functions.
-En example for what this means is that if you want to login you create a login try and a callback if login was succesfull.
-This relieves your own code from dealing with blocking api calls. See implementation/user for an example on this.
+The Android SDK for Quickblox in general presents you with a callback-based asynchronous package of functions.
+An example for what this means is that if You want to login, You create a login *try* and a callback if login was successful.
+#TODO - explain why this is different - normal synchronous behaviour - etc 
+This relieves your own code from having to deal with blocking API calls. See implementation/user for an example.
 
-This section is inspired by the useful documentation provided by quickblox on their website [#quickblox_website]_
+This section is inspired by the useful documentation provided by Quickblox on their website [#quickblox_website]_
 
 Installation
 -------------
 
-You download the Quickblox android sdk from their website [#quickblox_website]_ as a zip with examples included.
+You download the Quickblox Android SDK from their website [#quickblox_website]_ as a zip with examples included.
 Below you can see how the downloaded sdk is organized:
 
 .. image::
    images/quickblox_sdk_files.png
    :width: 30%
 
-The jars directory containts all the jars of the sdk, you choose which jars to embed in your project according to
-which functionality you want from quickblox.
+The jars directory contains all the jars of the SDK; You choose which jars to embed in your project according to the parts 
+of the Quickblox functionality you want.
 
 You can always take a look in the different sample projects if you are uncertain which jars are needed for a certain part
 of the api.
@@ -41,11 +42,11 @@ of the api.
 Setup example
 -------------
 
-You need to tell cradle to include the quickblox jars when building.
+You need to tell Cradle to include the quickblox jars when building.
 
-As an example i want to use the Users and Chat apis form the quickblox sdk. The User api lets you create
-and authenticate users as well as let users manage a user profile.
-The Chat api lets users chat with eachother and check if another user is online.
+As an example i want to use the Users and Chat API's form the Quickblox SDK. 
+The User API provides user authentication as well as means to letting users manage their user profiles.
+The Chat API provides user to user chat an the ability to check if another user is online.
 
 For this example you would need the following jars:
 (i replaced the version with VERSION)
@@ -53,8 +54,8 @@ For this example you would need the following jars:
 * quickblox-android-sdk-core_VERSION.jar
 * quickblox-android-sdk-chat-VERSION.jar
 
-The core jar contains all the core functionality of Quickblox like for example the User api.
-The chat jar contains all functions related to chat messaging.
+The *core* jar contains all the core functionality of Quickblox, for example the User api.
+The *chat* jar contains all functions related to chat messaging.
 
 You use the following syntax in your cradle settings
 
@@ -77,13 +78,13 @@ Implementation examples
 User
 ''''
 
-To use the Users api you need to start by creating a session.
+To use the Users API you need to start by creating a session.
 
 Session
 ,,,,,,,
 
 Quickblox provides a nice *createSession* function that takes a callback as a parameter.
-Therefore you don't have to worry about blocking the main thread!
+Therefore you don't have to worry about the main thread being blocked while creating the session!
 
 .. code-block:: java
 
@@ -92,29 +93,29 @@ Therefore you don't have to worry about blocking the main thread!
        @Override
        public void onSuccess(QBSession session, Bundle params) {
            /*
-           YEAH you created your first quickblox session!
-           now go and have some quickblox fun
+           YEAH you created your first Quickblox session!
+           now go and have some Quickblox fun
            */
        }
 
        @Override
        public void onError(List<String> errors) {
            /*
-           Too bad, there was an error establishing contact to the api server
-           try look in the errors list for an explanation!
+           Too bad, there was an error establishing contact to the API server
+           have a look in the error list for an explanation!
            */
        }
    });
 
-The quickblox api expects you to implement some kind of state machine where the different callbacks place you in a different state.
+The Quickblox API expects You to implement some kind of state machine where each callback places you in a corresponding state.
 The createSession callback should lead either to a *session success* or *connection error* state.
 
 Sign up
 ,,,,,,,
 
-If you are in the *session success* state you are able to do api calls to quickblox. Lets start by creating a user:
+If you are in the *session success* state you are able to do API calls to Quickblox. Let's start by creating a user:
 
-Lets create a user with the following information:
+Let's create a user with the following information:
 
 * username = karlmarx
 * password = kapital
@@ -130,21 +131,21 @@ Lets create a user with the following information:
        @Override
        public void onSuccess(QBUser user, Bundle args) {
            /*
-           YEAH! you chose a unique unused username and the api
-           succesfully created a new user
+           YEAH! you chose a unique, unused username and the API
+           successfully created a new user
            */
        }
 
        @Override
        public void onError(List<String> errors) {
            /*
-           Too bad, your new account were not accepted,
-           there can be any number of reasons, try look in the errors list ;-)
+           Too bad, your new account was not accepted,
+           there can be any number of reasons, have a look in the errors list ;-)
            */
        }
    });
 
-A quickblox user can have many more fields set on itself both at creation and later on.
+A Quickblox *user* can have many more fields set on it self both at creation and later on.
 These fields include:
 
 * facebook id
@@ -156,10 +157,10 @@ These fields include:
 Sign in
 ,,,,,,,
 
-When you have succesfully signed up you are allowed to sign in using the created user.
-You can sign in using a number of ways ranging from twitter/facebook tokens to using the native quickblox users api.
+When You have successfully signed up, You are allowed to sign in using the created user.
+You can sign in using any number of ways ranging from Twitter/Facebook tokens to using the native Quickblox users API.
 
-Continuing on our example i will describe the process of logging in with a username and a password.
+Continuing on our example I will describe the process of logging in with a username and a password.
 
 .. code-block:: java
 
@@ -176,13 +177,13 @@ Continuing on our example i will describe the process of logging in with a usern
        @Override
        public void onError(List<String> errors) {
            /*
-           Too bad either your credentials were rejected or any other number of reasons
+           Too bad, Your credentials were rejected 
            look in the errors list for forensics ;-)
            */
        }
    });
 
-This concludes the section on how to establish a quickblox session, next up is sending a *hello world* chat message.
+This concludes the section on how to establish a Quickblox session, next up is sending a *hello world* chat message.
 
 Chat
 ''''
@@ -202,18 +203,18 @@ You do it like this:
    }
    QBChatService.getInstance().startAutoSendPresence(60);
 
-Here we initialize the chatservice if its not allready initialized and then start transmitting presence notifications to quickblox.
+Here we initialize the chat service if its not already initialized and then start transmitting presence notifications to Quickblox.
 If you want to handle changes in the connection you have to implement the *"ConnectionListener*" interface.
 
 
 Chat "hello world"
 ,,,,,,,,,,,,,,,,,,
 
-Two ways to chat exist, 1-1 and group chat.
-I will describe 1-1 chat since it does not need the establishement of a group room beforehand.
+Quickblox provides two ways to implement chat, 1-1 and group chat.
+I will describe 1-1 chat since it does not depend on a *group room* to exist beforehand.
 
 To start a chat with another user you need to know the id of the user.
-If you don't know the id of the user you can get it by using another known field of the user.
+If you don't know the id of the user, You can get it by using another known field of the user.
 
 Here is an example of how to aqcuire the id of a user with username *"karlmarx"*:
 
@@ -233,11 +234,9 @@ Here is an example of how to aqcuire the id of a user with username *"karlmarx"*
        }
    });
 
-When you have the id of the user, then you are able to create a chat with this user.
+When you have the id of the user, You proceed to creating a chat with this user through the following steps:
 
-It works like this:
-
-**Define a QBMessageListener of type QBPrivateChat**
+**Define a QBMessageListener of type QBPrivateChat** 
 
 .. code-block:: java
 
@@ -299,10 +298,11 @@ It works like this:
 
    }
 
-The exceptions can be quite non descriptive since they often refer to functions from inside the sdk jars.
+The exceptions can be quite non descriptive since they often refer to functions from inside the SDK jars.
 
-This concludes the theory on the quickblox android sdk
+This concludes the theory on the Quickblox android SDK
 
 .. rubric:: Footnotes
 
 .. [#quickblox_website] http://quickblox.com/developers/Android#Download_Android_SDK.
+

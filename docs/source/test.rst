@@ -2,7 +2,8 @@ Testing
 =======
 
 I have only used informal testing in the develoment of Ripple.
-What i mean by informal testing is that i defined a list of actions i did every time i flashed the app to the emulator and based on the outcome beign either: regression, accepted, failed, i debugged until the bugs went away.
+What I mean by informal testing is that I defined a list of actions I did every time I flashed the app to the emulator and based 
+on the outcome being either: regression, accepted, failed, I debugged until the bugs were fixed.
 
 I used these actions during development to test the condition of the app:
 
