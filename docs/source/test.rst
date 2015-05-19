@@ -16,3 +16,7 @@ I used these actions during development to test the condition of the app:
     - Sign in, open contact list and add contact
     - Open contacts list, enable, disable contact
     - View MapFragment while a contact logs into another instance of the app. (check for communication)
+
+.. raw:: pdf
+
+   PageBreak

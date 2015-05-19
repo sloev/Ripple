@@ -139,4 +139,6 @@ I propose two solutions to solve the deadlock issue at hand:
 2. Change the application so all resources and threads used during map view are freed when entering the contact list view.
    This would involve stopping the "PrivateChatManager" from listening and the "locationsUpdatedRunnable" from running. This would probably be the easiest solution.
 
+.. raw:: pdf
 
+   PageBreak

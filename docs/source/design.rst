@@ -61,5 +61,7 @@ The figure beneath describes the relationships:
     The same as *1* with the added functionality that I actively transmit my location
     to users in this sub-sub-set at a fixed frequency.
 
+.. raw:: pdf
 
+   PageBreak
 

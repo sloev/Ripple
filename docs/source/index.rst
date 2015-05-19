@@ -15,3 +15,4 @@
    test.rst
    conclusion
    bibliography
+   appendices

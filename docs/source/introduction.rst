@@ -30,6 +30,7 @@ automatically be removed from the map for less cluttering.
 Requirements
 ------------
 
+
 +-------+------------------------------------------------------------------------------+
 | Name  |Description                                                                   |
 +=======+==============================================================================+
@@ -41,20 +42,20 @@ Requirements
 +-------+------------------------------------------------------------------------------+
 |R4     |Add contacts to contact list and enable/disable transmission to them          |
 +-------+------------------------------------------------------------------------------+
-|R5     |Automatically zoom in and show all enabled contacts on   |
+|R5     |Automatically zoom in and show all enabled contacts on                        |
 |       |map                                                                           |
 +-------+------------------------------------------------------------------------------+
-|R6     |Show all contacts on a map, if a contact does not ping its location within the|
-|       |allowed time frame it will be removed from the map. Within the time frame a   |
-|       |color change will represent the freshness of its location ping.               |
+|R6     |Show all contacts on a map, if a contact does not ping its location within    |
+|       |the allowed time frame it will be removed from the map. Within the time frame |
+|       |a color change will represent the freshness of its location ping.             |
 +-------+------------------------------------------------------------------------------+
 |R7     |Enable end to end encryption using Off-The-Record encryption                  |
 +-------+------------------------------------------------------------------------------+
-|R8     |Delete contacts															   |
+|R8     |Delete contacts                                                               |
 +-------+------------------------------------------------------------------------------+
-|R9	    |Brug lister og adaptere, netværkskommunikation, SharedPreferences             |
+|R9     |Brug lister og adaptere, netværkskommunikation, SharedPreferences             |
 +-------+------------------------------------------------------------------------------+
 
+.. raw:: pdf
 
-Lister og adaptere, Application-objekt, sensorer, netværkskomminikation, baggrundstråde f.eks. med AsyncTask, SharedPreferences, broadcast recievers, services, fragmenter
-
+   PageBreak

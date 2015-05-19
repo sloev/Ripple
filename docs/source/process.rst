@@ -114,3 +114,7 @@ I rewrote the whole program to use fragments and decided to use a Singleton for 
 .. rubric:: Footnotes
 
 .. [#xmpp_protocol] http://www.isode.com/whitepapers/xmpp.html
+
+.. raw:: pdf
+
+   PageBreak

@@ -306,3 +306,7 @@ This concludes the theory on the Quickblox android SDK
 
 .. [#quickblox_website] http://quickblox.com/developers/Android#Download_Android_SDK.
 
+.. raw:: pdf
+
+   PageBreak
+

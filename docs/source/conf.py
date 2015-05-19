@@ -351,12 +351,12 @@ pdf_documents = [
 # Section level that forces a break page.
 # For example: 1 means top-level sections start in a new page
 # 0 means disabled
-pdf_break_level = 1
+#pdf_break_level = 1
 
 
 # When a section starts in a new page, force it to be 'even', 'odd',
 # or just use 'any'
-pdf_breakside = 'any'
+#pdf_breakside = 'any'
 
 
 # Insert footnotes where they are defined instead of
@@ -373,11 +373,11 @@ pdf_use_index = False
 
 
 # If false, no modindex is generated.
-#pdf_use_modindex = True
+pdf_use_modindex = False
 
 
 # If false, no coverpage is generated.
-#pdf_use_coverpage = True
+pdf_use_coverpage = False
 
 
 # Name of the cover page template to use

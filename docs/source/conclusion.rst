@@ -28,52 +28,43 @@ The source of both my documentation and the app are at the github repository. [#
 Met requirements
 ----------------
 
-R1
-''
+**R1**
 
 I am using Quickblox sdk
 
-R2
-''
+**R2**
 
 I am using a container activity with a switching fragments for ui.
 
-R3
-''
+**R3**
 
 You are able to create and delete accounts, when deleted they are also deleted form the Quickblox server.
 
-R4
-''
+**R4**
 
 You can add contacts and disable/enable them in a fragment.
 
-R5
-''
+**R5**
 
 The map automatically zooms in to show all enabled contacts.
 
-R6
-''
+**R6**
 
 The app automatically sorts contacts for viewing and discrimates on the freshness of the location updates. 
 
-R9 
-''
+**R9** 
 
 I have used adapter for the client list. Application singleton for persistence in runtime and state sharing. SharedPreferences for persistence between application executions. Network communication for Quickblox api.
 
 Unmet requirements
 ------------------
 
-R7
-''
+**R7**
 
 I used too much time organizing my project into a more maintainable fragment solution and in the end there was not time left to implement encryption. 
 Encryption is not an easy task and the java libraries for doing OTR [#otr_lib]_ would take much time to incorporate into using the Quickbox BaaS.
 
-R8
-''
+**R8**
 
 As told about in the implementation section I had a deadlock bug in my application and the solution was outside the time frame of the project.
 
@@ -81,3 +72,7 @@ As told about in the implementation section I had a deadlock bug in my applicati
 
 .. [#repository] http://github.com/sloev/ripple
 .. [#otr_lib] https://code.google.com/p/otr4j/wiki/QuickStart
+
+.. raw:: pdf
+
+   PageBreak
