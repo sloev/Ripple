@@ -7,11 +7,6 @@
     <string name="action_add_contact">Add contact</string>
 
     <string name="action_delete_account">Delete account</string>
-    <string name="title_activity_signup">SignupActivity</string>
-    <string name="title_activity_sign_in">SignIn</string>
-    <string name="title_activity_map">MapActivity</string>
-    <string name="title_activity_splash">SplashActivity</string>
-    <string name="title_activity_signin">SigninActivity</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="sign_in_refused">Wrong password!</string>
@@ -44,7 +39,7 @@
     <string name="SIGN_UP_TITEL">SIGN UP</string>
 
     <string name="error_on_user_delete">Error deleting user, try again</string>
-    <string name="title_activity_single">SingleActivity</string>
+    <string name="title_activity_single">Ripple</string>
 
 
 

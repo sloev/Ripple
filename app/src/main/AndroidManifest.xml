@@ -12,19 +12,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name=".activites.SplashActivity"
-            android:label="@string/title_activity_splash" >
-
-        </activity>
-        <activity
-            android:name=".activites.SigninActivity"
-            android:label="@string/title_activity_signin" >
-        </activity>
-        <activity
-            android:name=".activites.SignupActivity"
-            android:label="@string/title_activity_signup" >
-        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -34,15 +21,6 @@
             android:value="AIzaSyD7UdDsB1Gv-9KOP_Phl7B_qwkXIFwuJH8" />
 
         <uses-library android:name="com.google.android.maps" />
-
-        <activity
-            android:name=".activites.MainDrawerActivity"
-            android:label="@string/title_activity_main_drawer" >
-        </activity>
-        <activity
-            android:name=".activites.SettingsActivity"
-            android:label="@string/title_activity_settings" >
-        </activity>
         <activity
             android:name=".activites.SingleActivity"
             android:label="@string/title_activity_single" >
